@@ -1,0 +1,65 @@
+:root{
+	--bg:#f6f7fb;
+	--card:#ffffff;
+	--muted:#6b7280;
+	--royal: #2b6ef6; /* royal blue */
+	--royal-dark:#2257c6;
+	--gold:#f6e7b8; /* light gold */
+	--accent:var(--royal);
+	--accent-600:var(--royal-dark);
+	--success:#16a34a;
+}
+html,body,#root{height:100%}
+body { font-family: Inter, Arial, sans-serif; background:var(--bg); color:#111; margin:0 }
+input, textarea, select, button { font-family: inherit }
+
+/* Auth form layout */
+.auth-container{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.auth-card{background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(16,24,40,0.08);width:100%;max-width:480px;padding:28px}
+.auth-card h2{margin:0 0 12px;font-size:22px}
+.auth-card p.lead{margin:0 0 18px;color:var(--muted)}
+.form-row{margin-bottom:12px}
+.form-row label{display:block;margin-bottom:6px;font-size:13px;color:var(--muted)}
+.form-row input[type="text"],.form-row input[type="email"],.form-row input[type="password"],.form-row textarea,.form-row select{width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;outline:none}
+.form-row textarea{min-height:100px}
+.btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+.btn.secondary{background:#e6eefc;color:var(--accent-600)}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.row{display:flex;gap:10px}
+.center{display:flex;justify-content:center}
+
+/* Post highlighting for alumni (used in PostFeed) */
+.alumni-post{background:#fff7e6}
+.student-post{background:#fff}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:linear-gradient(90deg,var(--royal),var(--royal-dark));color:#fff}
+.topbar .brand{font-weight:700;font-size:18px}
+.topbar a{color:rgba(255,255,255,0.95);text-decoration:none;margin-left:12px}
+
+/* Dashboard layout */
+.dashboard{display:grid;grid-template-columns:300px 1fr 320px;gap:20px;padding:24px}
+.sidebar{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
+.content{min-width:0}
+.rightcol{width:100%}
+.card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 4px 12px rgba(16,24,40,0.04);margin-bottom:16px}
+.stats{display:flex;gap:12px}
+.stat{flex:1;padding:12px;border-radius:8px;background:linear-gradient(180deg,#fff,#f8fbff);text-align:center}
+.stat h4{margin:0;font-size:18px;color:var(--royal)}
+.section-title{display:flex;justify-content:space-between;align-items:center}
+.btn.small{padding:6px 10px;font-size:13px;border-radius:8px}
+
+/* Post card */
+.post-card{border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(16,24,40,0.04)}
+.post-card .meta{font-size:12px;color:var(--muted)}
+.post-card .text{margin-top:8px}
+.post-card .actions{margin-top:10px}
+.post-card .btn.danger{background:#ef4444}
+
+/* small responsive tweak */
+@media (max-width:900px){
+	.dashboard{grid-template-columns:1fr;grid-auto-flow:row}
+	.sidebar{width:100%}
+	.rightcol{order:3}
+}
