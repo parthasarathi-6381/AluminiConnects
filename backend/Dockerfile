@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 5000
 
 # use dev script (nodemon) ideally defined in package.json as "dev": "nodemon server.js"
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
