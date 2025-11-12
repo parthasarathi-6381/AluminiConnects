@@ -44,19 +44,7 @@ export default function Login() {
       const profileData = await profileRes.json()
 
       // Navigate based on role
-      switch (profileData.role) {
-        case 'admin':
-          navigate('/admin')
-          break
-        case 'alumni':
-          navigate('/alumni')
-          break
-        case 'student':
-          navigate('/student')
-          break
-        default:
-          navigate('/')
-      }
+     navigate('/home')
     } catch (err) {
       console.error('Login error:', err)
       setError(err.message || 'Failed to login. Please check your credentials.')
