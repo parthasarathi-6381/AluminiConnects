@@ -1,7 +1,7 @@
 import admin from "./firebase/firebaseAdmin.js";
 
 const setAdminClaim = async () => {
-  const uid = "Y1MKVLdcGpUcnDtbvvZ3Qs028i73"; // replace with your admin UID
+  const uid = "QOoWJWyFvvWNy04nx173bpI2zLO2"; // replace with your admin UID
   try {
     // 1️⃣ mark email as verified
     await admin.auth().updateUser(uid, { emailVerified: true });
