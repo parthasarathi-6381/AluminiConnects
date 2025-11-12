@@ -176,7 +176,7 @@ export default function Signup() {
                     value={formData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
                     className="form-input pl-10"
-                    placeholder="you@example.com"
+                    placeholder="enter mail id"
                     required
                   />
                 </div>
@@ -261,7 +261,7 @@ export default function Signup() {
                     value={formData.regNo}
                     onChange={(e) => handleChange('regNo', e.target.value)}
                     className="form-input pl-10"
-                    placeholder="REG12345"
+                    placeholder="Enter Register No"
                     required
                   />
                 </div>
