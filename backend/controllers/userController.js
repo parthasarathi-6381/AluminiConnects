@@ -5,14 +5,14 @@ import { validateUserInput } from "../utils/validators.js";
 export const createUser = async (req, res) => {
   try {
      // validates the incoming data
-      const { error } = validateUserInput(req.body);
+   /*   const { error } = validateUserInput(req.body);
     if (error) {
       return res.status(400).json({
         success: false,
         message: "Validation failed",
         errors: error.details.map((err) => err.message),
       });
-    }
+    } */
 
     const { name, department, graduationYear } = req.body;
      const decoded = req.user;  //  decoded Firebase token from middleware
