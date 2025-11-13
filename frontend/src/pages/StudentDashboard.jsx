@@ -3,10 +3,12 @@ import { useAuth } from '../components/AuthProvider'
 import PostFeed from '../components/PostFeed'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
+import { useNavigate } from 'react-router-dom'
 
 export default function StudentDashboard(){
   const { profile } = useAuth()
   const [posts, setPosts] = useState([])
+  const navigate = useNavigate();
 
   useEffect(()=>{
     async function load(){
@@ -20,8 +22,13 @@ export default function StudentDashboard(){
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   }
+  const loggingOut=()=>{
+    navigate('/login');
+    return;
+  }
 
   return (
+    
     <div className="dashboard">
       {/* Left Sidebar - Profile */}
       <aside className="sidebar">
@@ -49,7 +56,7 @@ export default function StudentDashboard(){
         <div className="card" style={{marginBottom: 16}}>
           <PostFeed posts={posts} />
         </div>
-
+        <button onClick={loggingOut}>Logout</button>
        
       </main>
 

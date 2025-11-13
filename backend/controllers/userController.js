@@ -3,17 +3,19 @@ import User from "../models/User.js";
 import admin from "../firebase/firebaseAdmin.js";
 import { validateUserInput } from "../utils/validators.js";
 export const createUser = async (req, res) => {
+  console.log("Create user triggered");
   try {
      // validates the incoming data
-   /*   const { error } = validateUserInput(req.body);
+     console.log("Validate user!!!!", req.body);
+    /*  const { error } = validateUserInput(req.body);
     if (error) {
       return res.status(400).json({
         success: false,
         message: "Validation failed",
         errors: error.details.map((err) => err.message),
       });
-    } */
-
+    }*/
+    console.log("Account creation triggerd")
     const { name, department, graduationYear } = req.body;
      const decoded = req.user;  //  decoded Firebase token from middleware
     const { uid, email } = decoded;

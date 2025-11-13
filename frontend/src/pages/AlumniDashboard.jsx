@@ -4,11 +4,13 @@ import CreatePost from '../components/CreatePost'
 import PostFeed from '../components/PostFeed'
 import { collection, addDoc, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../firebase'
+import { useNavigate } from 'react-router-dom'
 
 export default function AlumniDashboard(){
   const { currentUser, profile } = useAuth()
   const [posts, setPosts] = useState([])
-
+  const navigate = useNavigate();
+  
   useEffect(()=>{
     async function load(){
       const p = await getDocs(collection(db,'posts'))
@@ -18,7 +20,10 @@ export default function AlumniDashboard(){
   },[])
 
   const onNewPost = (post)=> setPosts([post, ...posts])
-
+  const loggingOut=()=>{
+    navigate('/login');
+    return;
+  }
   const getInitials = (name) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -112,6 +117,7 @@ export default function AlumniDashboard(){
             </div>
           </div>
         </div>
+        <button onClick={loggingOut}>Logout</button>
       </aside>
     </div>
   )

@@ -1,0 +1,279 @@
+/* =========================================
+   GLOBAL PAGE STYLING
+========================================= */
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: #f5f6fb;
+}
+
+.admin-dashboard {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* =========================================
+   TOP NAVBAR
+========================================= */
+.admin-navbar {
+  width: 100%;
+  background: linear-gradient(90deg, #4f46e5, #6d5dfc);
+  padding: 16px 24px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.admin-navbar h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.logout-btn {
+  background: #ef4444;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease
+}
+
+.logout-btn:hover {
+  background: #d83a3a;
+}
+
+/* =========================================
+   GRID LAYOUT
+========================================= */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr 300px;
+  gap: 24px;
+  padding: 24px;
+}
+
+.sidebar,
+.rightbar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* =========================================
+   CARDS
+========================================= */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.muted {
+  color: #666;
+  font-size: 14px;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+.btn {
+  padding: 8px 14px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.btn:hover {
+  background: #4338ca;
+}
+
+.btn.small {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.btn.cancel {
+  background: #9ca3af;
+}
+
+.btn.cancel:hover {
+  background: #7b828b;
+}
+
+/* =========================================
+   STATS GRID
+========================================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.stat-card h3 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.stat-card p {
+  margin: 6px 0 0 0;
+  color: #666;
+}
+
+/* =========================================
+   ALUMNI LIST
+========================================= */
+.list-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.list-item strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 15px;
+}
+
+/* =========================================
+   EVENTS LIST
+========================================= */
+.event-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.event-item h4 {
+  margin: 0;
+}
+
+.event-item p {
+  margin: 4px 0;
+}
+
+/* =========================================
+   RIGHT SIDEBAR
+========================================= */
+.rightbar .card h4 {
+  margin-top: 0;
+}
+
+/* =========================================
+   MODAL OVERLAY
+========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.2s ease;
+}
+
+/* =========================================
+   MODAL BOX
+========================================= */
+.modal {
+  background: white;
+  padding: 28px;
+  border-radius: 12px;
+  width: 420px;
+  max-width: 95%;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.3);
+  animation: slideUp 0.25s ease;
+}
+
+.modal h2 {
+  margin-top: 0;
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+/* =========================================
+   FORM INPUTS
+========================================= */
+.modal label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.modal input,
+.modal textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.modal textarea {
+  resize: vertical;
+}
+
+/* =========================================
+   MODAL ACTION BUTTONS
+========================================= */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .rightbar, .sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 12px;
+  }
+}

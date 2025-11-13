@@ -1,142 +1,214 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../components/AuthProvider'
-import { db } from '../firebase'
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore'
-import PostFeed from '../components/PostFeed'
-
+import './AdminDashboard.css'
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'
 
-export default function AdminDashboard(){
-  const { currentUser } = useAuth()
-  const [alumni, setAlumni] = useState([])
-  const [posts, setPosts] = useState([])
+export default function AdminDashboard() {
 
-  useEffect(()=>{
-    async function load(){
-      // fetch alumni from backend (MongoDB)
-      try{
-        const res = await fetch(`${API_BASE}/api/users?role=alumni`)
-        if(res.ok){
-          const data = await res.json()
-          // backend expected to return array of users with _id or id
-          setAlumni(data.map(u=>({ id: u._id || u.id, ...u })))
-        }else{
-          setAlumni([])
-        }
-      }catch(err){
-        console.error('fetch alumni from backend', err)
-        setAlumni([])
+  const { currentUser, profile } = useAuth()
+  const [alumni, setAlumni] = useState([])
+  const [events, setEvents] = useState([])
+  const [posts, setPosts] = useState([])
+  const [showEventForm, setShowEventForm] = useState(false)
+
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    description: "",
+    date: "",
+    capacity: 100,
+    venue: "",
+    images: []
+  })
+
+  // ======================================
+  // LOAD ALUMNI, EVENTS, POSTS
+  // ======================================
+  useEffect(() => {
+    async function load() {
+      // Get alumni
+      const alumniRes = await fetch(`${API_BASE}/api/users?role=alumni`)
+      if (alumniRes.ok) {
+        const data = await alumniRes.json()
+        setAlumni(data)
       }
 
-      const p = await getDocs(collection(db,'posts'))
-      setPosts(p.docs.map(d=>({id:d.id, ...d.data()})))
-
-      // fetch meetings from backend
-      try{
-        const mr = await fetch(`${API_BASE}/api/meetings`)
-        if(mr.ok){
-          const meetings = await mr.json()
-          // For now we don't display them in detail in this prototype; you can extend UI.
-          console.log('meetings from backend', meetings)
-        }
-      }catch(e){
-        console.error('fetch meetings', e)
+      // Get events
+      const eventRes = await fetch(`${API_BASE}/api/events`)
+      if (eventRes.ok) {
+        const ev = await eventRes.json()
+        setEvents(ev)
       }
     }
     load()
-  },[])
+  }, [])
 
-  const verify = async (id)=>{
-    // Call backend to mark verified in MongoDB
-    try{
-      await fetch(`${API_BASE}/api/users/${id}/verify`, { method: 'PATCH' })
-      setAlumni(alumni.map(a=> a.id===id ? {...a, verified:true} : a))
-    }catch(err){
-      console.error('verify user via backend', err)
-      alert('Failed to verify user on backend')
+  // ================================
+  // HANDLE EVENT INPUTS
+  // ================================
+  const handleEventChange = (e) => {
+    const { name, value } = e.target
+    setNewEvent({ ...newEvent, [name]: value })
+  }
+
+  const handleImageUpload = (e) => {
+    setNewEvent({ ...newEvent, images: Array.from(e.target.files) })
+  }
+
+  // ================================
+  // SUBMIT EVENT
+  // ================================
+  const submitEvent = async (e) => {
+    e.preventDefault()
+
+    const fd = new FormData()
+    fd.append("title", newEvent.title)
+    fd.append("description", newEvent.description)
+    fd.append("date", newEvent.date)
+    fd.append("capacity", newEvent.capacity)
+    fd.append("venue", newEvent.venue)
+
+    // CreatedBy injected from admin profile
+    fd.append("createdBy_uid", profile.uid)
+    fd.append("createdBy_name", profile.name)
+    fd.append("createdBy_role", profile.role)
+
+    newEvent.images.forEach(file => fd.append("images", file))
+
+    const res = await fetch(`${API_BASE}/api/events`, {
+      method: "POST",
+      body: fd
+    })
+
+    if (res.ok) {
+      const created = await res.json()
+      setEvents([created, ...events])
+      setShowEventForm(false)
+    } else {
+      alert("Event creation failed")
     }
   }
 
-  const deletePost = async (id)=>{
-    // For prototype, just mark deleted flag
-    await updateDoc(doc(db,'posts',id), { deleted:true })
-    setPosts(posts.map(p=> p.id===id ? {...p, deleted:true} : p))
-  }
-
   return (
-    <div className="dashboard">
-      <aside className="sidebar">
-        <div className="card">
-          <h4>Admin</h4>
-          <div className="muted">Manage alumni, posts, meetings and donations</div>
-        </div>
+    <div className="admin-dashboard">
+      
+      {/* ========== TOP NAVBAR ========== */}
+      <div className="admin-navbar">
+        <h2>Admin Dashboard</h2>
+        <button className="logout-btn" onClick={() => navigate('/login')}>Logout</button>
+      </div>
 
-        <div className="card">
-          <h4 className="small">Quick actions</h4>
-          <div style={{marginTop:8}}>
-            <button className="btn small">View Donations</button>
+      <div className="dashboard-grid">
+
+        {/* LEFT SIDEBAR */}
+        <aside className="sidebar">
+          <div className="card">
+            <h3>Admin Panel</h3>
+            <p className="muted">Manage Users, Events, Posts</p>
           </div>
-        </div>
-      </aside>
 
-      <main className="content">
-        <div className="section-title">
-          <h2>Admin Dashboard</h2>
-          <div className="small muted">Signed in: {currentUser?.email}</div>
-        </div>
-
-        <div className="stats" style={{marginTop:12}}>
-          <div className="stat card">
-            <h4>{alumni.filter(a=>!a.verified).length}</h4>
-            <div className="muted">Unverified alumni</div>
+          <div className="card">
+            <h4>Create</h4>
+            <button className="btn" onClick={() => setShowEventForm(true)}>
+              + Create Event
+            </button>
           </div>
-          <div className="stat card">
-            <h4>{posts.length}</h4>
-            <div className="muted">Total posts</div>
-          </div>
-        </div>
+        </aside>
 
-        <div className="card" style={{marginTop:12}}>
-          <h3>Unverified Alumni</h3>
-          {alumni.filter(a=>!a.verified).length===0 && <div className="muted">No unverified alumni</div>}
-          <ul>
-            {alumni.filter(a=>!a.verified).map(a=> (
-              <li key={a.id} style={{marginBottom:8}}>
-                <strong>{a.email}</strong> <span className="muted">{a.batch} • {a.dept}</span>
-                <div style={{marginTop:6}}><button className="btn small" onClick={()=>verify(a.id)}>Verify</button></div>
-              </li>
+        {/* MAIN CONTENT */}
+        <main className="content">
+          
+          {/* STATS */}
+          <div className="stats-grid">
+            <div className="stat-card">
+              <h3>{alumni.filter(a => !a.verified).length}</h3>
+              <p>Unverified Alumni</p>
+            </div>
+            <div className="stat-card">
+              <h3>{posts.length}</h3>
+              <p>Total Posts</p>
+            </div>
+            <div className="stat-card">
+              <h3>{events.length}</h3>
+              <p>Total Events</p>
+            </div>
+          </div>
+
+          {/* UNVERIFIED ALUMNI */}
+          <div className="card">
+            <h3>Unverified Alumni</h3>
+            {alumni.filter(a => !a.verified).length === 0 && (
+              <p className="muted">No unverified alumni</p>
+            )}
+
+            {alumni.filter(a => !a.verified).map((a) => (
+              <div key={a._id} className="list-item">
+                <strong>{a.email}</strong>
+                <span className="muted">{a.batch} • {a.department}</span>
+                <button className="btn small" onClick={() => verify(a._id)}>Verify</button>
+              </div>
             ))}
-          </ul>
-        </div>
-
-        <div className="card">
-          <div className="section-title">
-            <h3>All Posts</h3>
           </div>
-          <PostFeed posts={posts} onDelete={deletePost} adminView />
-        </div>
 
-        <div className="card">
-          <h3>Meetings</h3>
-          <p className="muted">Meeting requests are available via the backend. Extend this UI to approve/disapprove.</p>
-        </div>
-      </main>
+          {/* ALL EVENTS */}
+          <div className="card">
+            <h3>Events</h3>
 
-      <aside className="rightcol">
-        <div className="card">
-          <h4>LinkedIn News</h4>
-          <ul className="muted">
-            <li>Apple preps satellite features</li>
-            <li>Wedding season lift jewel stocks</li>
-            <li>India Inc revenue drops</li>
-          </ul>
-        </div>
+            {events.map((ev) => (
+              <div key={ev._id} className="event-item">
+                <h4>{ev.title}</h4>
+                <p>{ev.date?.substring(0, 10)} • {ev.venue}</p>
+                <p className="muted">Status: {ev.status}</p>
+              </div>
+            ))}
 
-        <div className="card">
-          <h4>Events</h4>
-          <div className="muted">No upcoming events. Admin can create events from the backend.</div>
+          </div>
+
+        </main>
+
+        {/* RIGHT SIDEBAR */}
+        <aside className="rightbar">
+          <div className="card">
+            <h4>Latest</h4>
+            <p className="muted">Event management active</p>
+          </div>
+        </aside>
+
+      </div>
+
+      {/* EVENT CREATION MODAL */}
+      {showEventForm && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Create Event</h2>
+
+            <form onSubmit={submitEvent}>
+              <label>Event Name</label>
+              <input name="title" required onChange={handleEventChange} />
+
+              <label>Description</label>
+              <textarea name="description" required onChange={handleEventChange}></textarea>
+
+              <label>Date</label>
+              <input type="date" name="date" required onChange={handleEventChange} />
+
+              <label>Venue</label>
+              <input name="venue" required onChange={handleEventChange} />
+
+              <label>Capacity</label>
+              <input type="number" name="capacity" defaultValue={100} onChange={handleEventChange} />
+
+              <label>Upload Images</label>
+              <input type="file" multiple onChange={handleImageUpload} />
+
+              <div className="modal-actions">
+                <button type="button" className="btn cancel" onClick={() => setShowEventForm(false)}>Cancel</button>
+                <button type="submit" className="btn">Create Event</button>
+              </div>
+            </form>
+          </div>
         </div>
-      </aside>
+      )}
+
     </div>
   )
 }

@@ -10,7 +10,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const email = "teststudent@citchennai.net";
+const email = "admin@citchennai.net";
 const password = "test1234";
 
 (async () => {
