@@ -10,18 +10,7 @@ function Events() {
     catch(console.log('thappa iruku na'))},[]);
   return (
     <div>
-       <div className='s'>
-        {
-            events.map((event)=>{
-                return <div>
-                    <h4>{event.title}</h4>
-                    <img src={event.image} alt="" className='event' />
-                    <p>{event.tagline}</p>
-                </div>
-            }
-           )
-        }
-       </div>
+      ithu thanda events
     </div>
   )
 }

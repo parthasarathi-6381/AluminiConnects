@@ -35,6 +35,7 @@ export default function Navbar() {
         <NavLink to="/home" className="nav-link">Home</NavLink>
         <NavLink to="/events" className="nav-link">Events</NavLink>
         <NavLink to="/donations" className="nav-link">Donations</NavLink>
+        <NavLink to="/jobs" className="nav-link">Jobs</NavLink>
         <NavLink to="/messages" className="nav-link">Messages</NavLink>
       </div>
 

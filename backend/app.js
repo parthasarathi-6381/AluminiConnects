@@ -9,7 +9,10 @@ import userRoutes from './routes/user.routes.js';
 import discussionRoutes from './routes/discussion.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import eventRoutes from './routes/event.routes.js';
+import jobRoutes from './routes/job.routes.js';
 import "./cronJobs/cleanUpEvents.js";
+console.log("✅ app.js loaded");
+
 const app = express();
 
 app.use(express.json());
@@ -21,6 +24,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/discussion', discussionRoutes);
 app.use('/api/admin',adminRoutes);
 app.use('/api/events',eventRoutes);
+app.use("/api/jobs", jobRoutes);
 
 app.get('/', (req, res) => res.send('Alumni Discussion Backend'));
 

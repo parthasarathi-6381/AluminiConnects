@@ -12,7 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Events from "./pages/Events";
 import Donations from "./pages/Donations";
-
+import Jobs from "./pages/Jobs"
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -40,6 +40,7 @@ export default function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/events" element={<Events />} />
         <Route path="/donations" element={<Donations />} />
+        <Route path="/Jobs" element={<Jobs/>}/>
 
         <Route
           path="/admin"
