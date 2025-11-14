@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { getAuth } from "firebase/auth";
 
 function Jobs() {
   const [jobs, setJobs] = useState([]);
@@ -8,13 +9,20 @@ function Jobs() {
   // Fetch jobs using native fetch()
   const fetchJobs = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/jobs");
+       const auth = getAuth();
+    const token = await auth.currentUser.getIdToken();
+
+    const res = await fetch("http://localhost:5000/api/jobs/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
       if (!res.ok) throw new Error("Failed to fetch jobs");
       const data = await res.json();
 
-      // Newest jobs first
-      const sorted = [...data].reverse();
-      setJobs(sorted);
+    
+      setJobs(data);
       setLoading(false);
     } catch (err) {
       console.error("Error:", err);

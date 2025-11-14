@@ -11,7 +11,7 @@ import adminRoutes from './routes/admin.routes.js';
 import eventRoutes from './routes/event.routes.js';
 import jobRoutes from './routes/job.routes.js';
 import "./cronJobs/cleanUpEvents.js";
-console.log("✅ app.js loaded");
+
 
 const app = express();
 

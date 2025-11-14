@@ -1,31 +1,12 @@
 // routes/jobRoutes.js
 import express from "express";
-import Job from "../models/Jobs.js";
+import { getAllJobs, createJobs, deleteJobs } from "../controllers/jobController.js";
+import verifyFirebaseToken from "../middleware/verifyFirebaseToken.js";
 
 const router = express.Router();
 
-// GET all jobs
-router.get("/", async (req, res) => {
-  try {
-    const jobs = await Job.find().sort({ createdAt: -1 });
-    res.json(jobs);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch jobs", error: err.message });
-  }
-});
-
-
-// POST a new job
-router.post("/", async (req, res) => {
-  try {
-    const job = new Job(req.body);
-    await job.save();
-    res.status(201).json(job);
-  } catch (err) {
-    res.status(400).json({ message: "Failed to create job", error: err.message });
-  }
-});
-console.log("📩 GET /api/jobs hit");
-
+router.get("/", verifyFirebaseToken, getAllJobs);
+router.post("/", verifyFirebaseToken, createJobs);
+router.delete("/:id", verifyFirebaseToken, deleteJobs);
 
 export default router;

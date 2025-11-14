@@ -15,7 +15,7 @@ import Donations from "./pages/Donations";
 import Jobs from "./pages/Jobs"
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
+import ForgotPassword from "./pages/ForgotPassword";
 import { useAuth } from "./components/AuthProvider";
 
 export default function App() {
@@ -23,7 +23,7 @@ export default function App() {
   const location = useLocation();
 
   // Hide navbar on login + signup pages
-  const hideNavbarPaths = ["/login", "/signup"];
+  const hideNavbarPaths = ["/login", "/signup","/forgot-password"];
   const shouldShowNavbar = !hideNavbarPaths.includes(location.pathname) && profile;
 
   return (
@@ -36,11 +36,16 @@ export default function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+
 
         <Route path="/home" element={<Home />} />
         <Route path="/events" element={<Events />} />
         <Route path="/donations" element={<Donations />} />
         <Route path="/Jobs" element={<Jobs/>}/>
+        
+        
 
         <Route
           path="/admin"
@@ -71,6 +76,7 @@ export default function App() {
       </Routes>
 
       {/* Optional footer */}
+      
       {/* <Footer /> */}
     </>
   );

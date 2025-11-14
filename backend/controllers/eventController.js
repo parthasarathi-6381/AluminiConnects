@@ -1,4 +1,4 @@
-import Event from "../models/Event.js";
+import Event from "../models/event.js";
 import Registration from "../models/registration.js";
 import ExcelJS from "exceljs";
 import User from "../models/User.js";

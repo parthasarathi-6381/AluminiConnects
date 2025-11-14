@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthProvider";
+import { getAuth } from "firebase/auth";
 
 export default function AlumniDashboard() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -25,7 +26,15 @@ export default function AlumniDashboard() {
   // 🔹 Fetch all jobs
   const fetchJobs = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/jobs");
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+
+      const res = await fetch("http://localhost:5000/api/jobs/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (!res.ok) throw new Error("Failed to fetch jobs");
       const data = await res.json();
       setJobs(data);
@@ -38,11 +47,18 @@ export default function AlumniDashboard() {
   const handleJobPost = async (e) => {
     e.preventDefault();
     try {
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+
       const res = await fetch("http://localhost:5000/api/jobs", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(newJob),
       });
+
       if (!res.ok) throw new Error("Failed to post job");
 
       setNewJob({
@@ -62,6 +78,32 @@ export default function AlumniDashboard() {
       fetchJobs();
     } catch (err) {
       console.error("Error posting job:", err);
+    }
+  };
+
+  // 🔹 Delete job
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this job?")) return;
+
+    try {
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+
+      const res = await fetch(`http://localhost:5000/api/jobs/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to delete job");
+
+      setSuccessMsg("🗑️ Job deleted successfully!");
+      setTimeout(() => setSuccessMsg(""), 3000);
+
+      fetchJobs(); // Refresh after delete
+    } catch (err) {
+      console.error("Error deleting job:", err);
     }
   };
 
@@ -129,6 +171,7 @@ export default function AlumniDashboard() {
               <div className="card-body">
                 <form onSubmit={handleJobPost} className="p-2">
                   <div className="row g-3">
+                    {/* All job form inputs exactly same as your original */}
                     <div className="col-md-6">
                       <label className="form-label fw-semibold">Company</label>
                       <input
@@ -141,6 +184,7 @@ export default function AlumniDashboard() {
                         required
                       />
                     </div>
+
                     <div className="col-md-6">
                       <label className="form-label fw-semibold">Role</label>
                       <input
@@ -153,6 +197,7 @@ export default function AlumniDashboard() {
                         required
                       />
                     </div>
+
                     <div className="col-md-4">
                       <label className="form-label fw-semibold">Duration</label>
                       <input
@@ -165,6 +210,7 @@ export default function AlumniDashboard() {
                         required
                       />
                     </div>
+
                     <div className="col-md-4">
                       <label className="form-label fw-semibold">Stipend</label>
                       <input
@@ -177,6 +223,7 @@ export default function AlumniDashboard() {
                         required
                       />
                     </div>
+
                     <div className="col-md-4">
                       <label className="form-label fw-semibold">Mode</label>
                       <select
@@ -196,6 +243,7 @@ export default function AlumniDashboard() {
                         <option value="Hybrid">🌐 Hybrid</option>
                       </select>
                     </div>
+
                     <div className="col-md-12">
                       <label className="form-label fw-semibold">
                         Application Link
@@ -210,6 +258,7 @@ export default function AlumniDashboard() {
                         required
                       />
                     </div>
+
                     <div className="col-md-12">
                       <label className="form-label fw-semibold">
                         Job Description
@@ -225,6 +274,7 @@ export default function AlumniDashboard() {
                         required
                       />
                     </div>
+
                     <div className="col-md-12">
                       <label className="form-label fw-semibold">Posted By</label>
                       <input
@@ -238,6 +288,7 @@ export default function AlumniDashboard() {
                       />
                     </div>
                   </div>
+
                   <button type="submit" className="btn btn-success mt-4 px-4">
                     🚀 Post Job
                   </button>
@@ -262,10 +313,12 @@ export default function AlumniDashboard() {
                         </span>{" "}
                         ({job.duration})
                       </p>
+
                       <p className="text-muted small">{job.description}</p>
                       <p>
                         💰 <strong>{job.stipend}</strong>
                       </p>
+
                       <a
                         href={job.link}
                         target="_blank"
@@ -274,6 +327,15 @@ export default function AlumniDashboard() {
                       >
                         🔗 Apply Here
                       </a>
+
+                      {/* 🔹 DELETE BUTTON */}
+                      <button
+                        className="btn btn-danger btn-sm ms-2"
+                        onClick={() => handleDelete(job._id)}
+                      >
+                        🗑️ Delete
+                      </button>
+
                       <br />
                       <small className="text-secondary">
                         Posted by {job.postedBy} on{" "}
