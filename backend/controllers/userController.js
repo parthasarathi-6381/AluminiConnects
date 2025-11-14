@@ -16,7 +16,10 @@ export const createUser = async (req, res) => {
       });
     }*/
     console.log("Account creation triggerd")
-    const { name, department, graduationYear } = req.body;
+   const { name, department, graduationYear } = req.body;
+    if (!department || !graduationYear) {
+         return res.status(400).json({ message: "Profile incomplete" });
+       }
      const decoded = req.user;  //  decoded Firebase token from middleware
     const { uid, email } = decoded;
     const existingUser = await User.findOne({ email});
@@ -81,5 +84,17 @@ export const getProfile = async (req, res) => {
   } catch (error) {
     console.error("Error fetching profile:", error);
     res.status(500).json({ message: "Error fetching profile", error: error.message });
+  }
+};
+
+// check existing user
+
+export const checkExistingUser = async (req, res) => {
+  console.log("check existing user is triggered!!");
+  try {
+    const user = await User.findOne({ uid: req.params.uid });
+    res.json({ exists: !!user });
+  } catch (err) {
+    res.status(500).json({ message: "Error checking user", error: err });
   }
 };

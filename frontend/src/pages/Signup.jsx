@@ -6,6 +6,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import GoogleAuthButton from "../components/GoogleAuthButton";
 
 import {
   User,
@@ -266,6 +267,7 @@ export default function Signup() {
                 >
                   {loading ? "Creating Account..." : "Sign Up"}
                 </button>
+                <GoogleAuthButton />
               </form>
 
               <p className="text-center text-light mt-3">

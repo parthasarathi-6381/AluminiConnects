@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
+import GoogleAuthButton from "../components/GoogleAuthButton.jsx";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -131,8 +132,9 @@ export default function Login() {
                   className="btn btn-primary w-100 py-2 fw-bold fs-5"
                   disabled={loading}
                 >
-                  {loading ? "Processing..." : "Login"}
+                {loading ? "Processing..." : "Login"}
                 </button>
+                  <GoogleAuthButton />
               </form>
 
               {/* Signup link */}

@@ -1,6 +1,7 @@
 // src/App.jsx
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import CompleteProfile from "./pages/CompleteProfile.jsx";
 
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -39,7 +40,7 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
 
-
+        <Route path="/complete-profile" element={<CompleteProfile />} />
         <Route path="/home" element={<Home />} />
         <Route path="/events" element={<Events />} />
         <Route path="/donations" element={<Donations />} />
