@@ -1,6 +1,7 @@
+// src/pages/AlumniDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthProvider";
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 
 export default function AlumniDashboard() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -21,9 +22,10 @@ export default function AlumniDashboard() {
 
   useEffect(() => {
     fetchJobs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 🔹 Fetch all jobs
+  // 🔹 Fetch all jobs (UNCHANGED)
   const fetchJobs = async () => {
     try {
       const auth = getAuth();
@@ -43,7 +45,7 @@ export default function AlumniDashboard() {
     }
   };
 
-  // 🔹 Post new job
+  // 🔹 Post new job (UNCHANGED)
   const handleJobPost = async (e) => {
     e.preventDefault();
     try {
@@ -72,7 +74,7 @@ export default function AlumniDashboard() {
         postedBy: "",
       });
 
-      setSuccessMsg("🎉 Job posted successfully!");
+      setSuccessMsg("Job posted successfully!");
       setTimeout(() => setSuccessMsg(""), 3000);
 
       fetchJobs();
@@ -81,7 +83,7 @@ export default function AlumniDashboard() {
     }
   };
 
-  // 🔹 Delete job
+  // 🔹 Delete job (UNCHANGED)
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
 
@@ -98,7 +100,7 @@ export default function AlumniDashboard() {
 
       if (!res.ok) throw new Error("Failed to delete job");
 
-      setSuccessMsg("🗑️ Job deleted successfully!");
+      setSuccessMsg("Job deleted successfully!");
       setTimeout(() => setSuccessMsg(""), 3000);
 
       fetchJobs(); // Refresh after delete
@@ -107,252 +109,325 @@ export default function AlumniDashboard() {
     }
   };
 
+  const handleLogout = async () => {
+    const auth = getAuth();
+    await signOut(auth);
+    window.location.href = "/login";
+  };
+
   return (
-    <div className="d-flex vh-100 bg-light">
-      {/* Sidebar */}
-      <div className="bg-dark text-white p-4" style={{ width: "250px" }}>
-        <h3 className="mb-4 text-center">🎓 Alumni Panel</h3>
-        <ul className="nav flex-column">
-          <li className="nav-item mb-2">
+    <div className="d-flex vh-100 position-relative overflow-hidden" style={{ background: "linear-gradient(135deg,#0d0f23 0%, #1a1f3c 40%, #2c0f49 100%)" }}>
+      {/* Animated background blobs (same feel as login) */}
+      <div className="bg-shape1"></div>
+      <div className="bg-shape2"></div>
+
+      {/* SIDEBAR */}
+      <aside
+        className="d-flex flex-column p-4 text-white"
+        style={{
+          width: 260,
+          zIndex: 20,
+          background: "rgba(255,255,255,0.04)",
+          backdropFilter: "blur(12px)",
+          borderRight: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
+        <div>
+          <h3 className="mb-4 text-center fw-bold">Alumni Panel</h3>
+
+          <div className="d-grid gap-2 mb-2">
             <button
-              className={`btn w-100 text-start ${
-                activeTab === "profile" ? "btn-primary" : "btn-outline-light"
-              }`}
+              className={`btn ${activeTab === "profile" ? "btn-primary" : "btn-outline-light"}`}
               onClick={() => setActiveTab("profile")}
             >
-              👤 Profile
+              Profile
             </button>
-          </li>
-          <li className="nav-item mb-2">
+
             <button
-              className={`btn w-100 text-start ${
-                activeTab === "jobs" ? "btn-primary" : "btn-outline-light"
-              }`}
+              className={`btn ${activeTab === "jobs" ? "btn-primary" : "btn-outline-light"}`}
               onClick={() => setActiveTab("jobs")}
             >
-              💼 Jobs
+              Jobs
             </button>
-          </li>
-        </ul>
-      </div>
+          </div>
+        </div>
 
-      {/* Main Content */}
-      <div className="flex-grow-1 p-4 overflow-auto">
-        {activeTab === "profile" && (
-          <div>
-            <h3 className="fw-bold mb-4 text-primary">👤 My Profile</h3>
-            <div className="card shadow p-4 border-0">
-              <h5>
-                Name: <span className="text-primary">{profile?.name}</span>
-              </h5>
-              <h6>Email: {profile?.email}</h6>
-              <h6>
-                Batch: {profile.graduationYear - 4}-{profile.graduationYear}
-              </h6>
-              <h6>Department: {profile.department}</h6>
-            </div>
+        {/* Logout pinned to bottom (mt-auto) */}
+        <div className="mt-auto">
+          <button
+            onClick={handleLogout}
+            className="btn btn-danger w-100"
+            style={{ borderRadius: 10 }}
+          >
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <main className="flex-grow-1 p-4 overflow-auto" style={{ zIndex: 10 }}>
+        {successMsg && (
+          <div className="alert alert-success text-center mx-auto" style={{ maxWidth: 800 }}>
+            {successMsg}
           </div>
         )}
 
+        {/* PROFILE PANEL */}
+        {activeTab === "profile" && (
+          <section className="mx-auto" style={{ maxWidth: 900 }}>
+            <div
+              className="p-5 mb-4"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                borderRadius: 18,
+                border: "1px solid rgba(255,255,255,0.08)",
+                backdropFilter: "blur(12px)",
+              }}
+            >
+              <h2 className="fw-bold mb-3">My Profile</h2>
+              <div className="mb-2"><strong>Name:</strong> <span className="text-info">{profile?.name}</span></div>
+              <div className="mb-2"><strong>Email:</strong> {profile?.email}</div>
+              <div className="mb-2"><strong>Batch:</strong> {profile?.graduationYear - 4}-{profile?.graduationYear}</div>
+              <div className="mb-2"><strong>Department:</strong> {profile?.department}</div>
+            </div>
+          </section>
+        )}
+
+        {/* JOBS PANEL */}
         {activeTab === "jobs" && (
-          <div>
-            <h3 className="fw-bold mb-4 text-primary">💼 Job Portal</h3>
+          <section>
+            <h2 className="fw-bold mb-3 text-white">Job Portal</h2>
 
-            {/* Success Message */}
-            {successMsg && (
-              <div className="alert alert-success py-2">{successMsg}</div>
-            )}
-
-            {/* Post Job */}
-            <div className="card shadow mb-4 border-0">
-              <div className="card-header bg-primary text-white fw-bold fs-5">
-                Post a Job
-              </div>
-              <div className="card-body">
-                <form onSubmit={handleJobPost} className="p-2">
+            {/* Post Job - UI only (functions unchanged) */}
+            <div
+              className="p-4 mb-4"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                borderRadius: 16,
+                border: "1px solid rgba(255,255,255,0.08)",
+                backdropFilter: "blur(12px)",
+                maxWidth: 1000,
+              }}
+            >
+              <div className="card-body p-0">
+                <form onSubmit={handleJobPost}>
                   <div className="row g-3">
-                    {/* All job form inputs exactly same as your original */}
+
                     <div className="col-md-6">
-                      <label className="form-label fw-semibold">Company</label>
+                      <label className="form-label text-white">Company</label>
                       <input
-                        className="form-control"
+                        className="form-control bg-dark text-white border-0"
                         placeholder="Enter company name"
                         value={newJob.company}
-                        onChange={(e) =>
-                          setNewJob({ ...newJob, company: e.target.value })
-                        }
+                        onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
                         required
+                        style={{ height: 44 }}
                       />
                     </div>
 
                     <div className="col-md-6">
-                      <label className="form-label fw-semibold">Role</label>
+                      <label className="form-label text-white">Role</label>
                       <input
-                        className="form-control"
+                        className="form-control bg-dark text-white border-0"
                         placeholder="Enter role title"
                         value={newJob.role}
-                        onChange={(e) =>
-                          setNewJob({ ...newJob, role: e.target.value })
-                        }
+                        onChange={(e) => setNewJob({ ...newJob, role: e.target.value })}
                         required
+                        style={{ height: 44 }}
                       />
                     </div>
 
                     <div className="col-md-4">
-                      <label className="form-label fw-semibold">Duration</label>
+                      <label className="form-label text-white">Duration</label>
                       <input
-                        className="form-control"
+                        className="form-control bg-dark text-white border-0"
                         placeholder="e.g. 6 months"
                         value={newJob.duration}
-                        onChange={(e) =>
-                          setNewJob({ ...newJob, duration: e.target.value })
-                        }
+                        onChange={(e) => setNewJob({ ...newJob, duration: e.target.value })}
                         required
+                        style={{ height: 44 }}
                       />
                     </div>
 
                     <div className="col-md-4">
-                      <label className="form-label fw-semibold">Stipend</label>
+                      <label className="form-label text-white">Stipend</label>
                       <input
-                        className="form-control"
+                        className="form-control bg-dark text-white border-0"
                         placeholder="e.g. Rs.10000"
                         value={newJob.stipend}
-                        onChange={(e) =>
-                          setNewJob({ ...newJob, stipend: e.target.value })
-                        }
+                        onChange={(e) => setNewJob({ ...newJob, stipend: e.target.value })}
                         required
+                        style={{ height: 44 }}
                       />
                     </div>
 
+                    {/* MODE dropdown — exact values preserved */}
                     <div className="col-md-4">
-                      <label className="form-label fw-semibold">Mode</label>
+                      <label className="form-label text-white">Mode</label>
                       <select
-                        className="form-select border-primary fw-semibold text-dark"
-                        style={{ backgroundColor: "#e9f5ff" }}
+                        className="form-select bg-dark text-white border-0"
                         value={newJob.mode}
-                        onChange={(e) =>
-                          setNewJob({ ...newJob, mode: e.target.value })
-                        }
+                        onChange={(e) => setNewJob({ ...newJob, mode: e.target.value })}
                         required
+                        style={{ height: 44 }}
                       >
-                        <option value="" disabled>
-                          -- Select Job Mode --
-                        </option>
-                        <option value="Online">🖥️ Online</option>
-                        <option value="Offline">🏢 Offline</option>
-                        <option value="Hybrid">🌐 Hybrid</option>
+                        <option value="" disabled>-- Select Job Mode --</option>
+                        <option value="Online">Online</option>
+                        <option value="Offline">Offline</option>
+                        <option value="Hybrid">Hybrid</option>
                       </select>
                     </div>
 
                     <div className="col-md-12">
-                      <label className="form-label fw-semibold">
-                        Application Link
-                      </label>
+                      <label className="form-label text-white">Application Link</label>
                       <input
-                        className="form-control"
+                        className="form-control bg-dark text-white border-0"
                         placeholder="https://example.com/apply"
                         value={newJob.link}
-                        onChange={(e) =>
-                          setNewJob({ ...newJob, link: e.target.value })
-                        }
+                        onChange={(e) => setNewJob({ ...newJob, link: e.target.value })}
                         required
+                        style={{ height: 44 }}
                       />
                     </div>
 
                     <div className="col-md-12">
-                      <label className="form-label fw-semibold">
-                        Job Description
-                      </label>
+                      <label className="form-label text-white">Job Description</label>
                       <textarea
-                        className="form-control"
+                        className="form-control bg-dark text-white border-0"
                         placeholder="Brief description about the job..."
                         rows="3"
                         value={newJob.description}
-                        onChange={(e) =>
-                          setNewJob({ ...newJob, description: e.target.value })
-                        }
+                        onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
                         required
+                        style={{ minHeight: 100 }}
                       />
                     </div>
 
                     <div className="col-md-12">
-                      <label className="form-label fw-semibold">Posted By</label>
+                      <label className="form-label text-white">Posted By</label>
                       <input
-                        className="form-control"
+                        className="form-control bg-dark text-white border-0"
                         placeholder="Enter your name"
                         value={newJob.postedBy}
-                        onChange={(e) =>
-                          setNewJob({ ...newJob, postedBy: e.target.value })
-                        }
+                        onChange={(e) => setNewJob({ ...newJob, postedBy: e.target.value })}
                         required
+                        style={{ height: 44 }}
                       />
                     </div>
-                  </div>
 
-                  <button type="submit" className="btn btn-success mt-4 px-4">
-                    🚀 Post Job
-                  </button>
+                    <div className="col-12 mt-2">
+                      <button type="submit" className="btn btn-primary px-4">
+                        Post Job
+                      </button>
+                    </div>
+                  </div>
                 </form>
               </div>
             </div>
 
-            {/* Job List */}
-            <div className="card shadow border-0">
-              <div className="card-header bg-dark text-white fw-bold fs-5">
-                Recent Job Posts
-              </div>
+            {/* RECENT JOB POSTS — preserved */}
+            <div
+              className="p-3"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                borderRadius: 12,
+                border: "1px solid rgba(255,255,255,0.06)",
+                maxWidth: 1000,
+              }}
+            >
+              <h5 className="mb-3 text-white">Recent Job Posts</h5>
+
               <ul className="list-group list-group-flush">
                 {jobs.length > 0 ? (
                   jobs.map((job, i) => (
-                    <li key={i} className="list-group-item py-3">
-                      <h5 className="fw-bold text-primary">{job.role}</h5>
-                      <p className="mb-1">
-                        <strong>{job.company}</strong> —{" "}
-                        <span className="badge bg-info text-dark">
-                          {job.mode}
-                        </span>{" "}
-                        ({job.duration})
-                      </p>
-
+                    <li key={i} className="list-group-item mb-3" style={{ background: "rgba(0,0,0,0.5)", borderRadius: 8 }}>
+                      <h5 className="fw-bold text-info">{job.role}</h5>
+                      <p className="mb-1"><strong>{job.company}</strong> — <span className="badge bg-info text-dark">{job.mode}</span> ({job.duration})</p>
                       <p className="text-muted small">{job.description}</p>
-                      <p>
-                        💰 <strong>{job.stipend}</strong>
-                      </p>
+                      <p><strong>Stipend:</strong> {job.stipend}</p>
 
-                      <a
-                        href={job.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-outline-primary btn-sm"
-                      >
-                        🔗 Apply Here
-                      </a>
+                      <a href={job.link} target="_blank" rel="noopener noreferrer" className="btn btn-outline-primary btn-sm">Apply Here</a>
+                      <button className="btn btn-danger btn-sm ms-2" onClick={() => handleDelete(job._id)}>Delete</button>
 
-                      {/* 🔹 DELETE BUTTON */}
-                      <button
-                        className="btn btn-danger btn-sm ms-2"
-                        onClick={() => handleDelete(job._id)}
-                      >
-                        🗑️ Delete
-                      </button>
-
-                      <br />
-                      <small className="text-secondary">
-                        Posted by {job.postedBy} on{" "}
-                        {new Date(job.createdAt).toLocaleDateString()}
-                      </small>
+                      <div className="mt-2"><small className="text-secondary">Posted by {job.postedBy} on {new Date(job.createdAt).toLocaleDateString()}</small></div>
                     </li>
                   ))
                 ) : (
-                  <li className="list-group-item text-center text-muted py-3">
-                    No jobs posted yet.
-                  </li>
+                  <li className="list-group-item text-center text-muted py-3">No jobs posted yet.</li>
                 )}
               </ul>
             </div>
-          </div>
+          </section>
         )}
-      </div>
+      </main>
+
+      {/* Local styles to match Login UI and ensure placeholders visible */}
+      <style>{`
+  /* floating background blobs */
+  .bg-shape1, .bg-shape2 {
+    position: absolute; width: 350px; height: 350px;
+    border-radius: 50%; filter: blur(80px); z-index: 5;
+  }
+  .bg-shape1 { top: -80px; left: -60px; background: rgba(0,123,255,0.45); animation: float 6s ease-in-out infinite; }
+  .bg-shape2 { bottom: -80px; right: -60px; background: rgba(255,0,150,0.45); animation: float 8s ease-in-out infinite; }
+  @keyframes float {0%{transform:translateY(0);}50%{transform:translateY(25px);}100%{transform:translateY(0);} }
+
+  /* 🌟 PLACEHOLDER FIX — LIGHT + CLEAR */
+  ::placeholder {
+    color: rgba(255,255,255,0.65) !important;
+    opacity: 1 !important;
+  }
+  input, textarea, select {
+    color: #fff !important;
+  }
+
+  /* 🌟 Profile & Job description text visible */
+  .text-muted, .text-secondary, .list-group-item p {
+    color: rgba(220,220,220,0.85) !important;
+  }
+  strong {
+    color: #ffffff !important;
+  }
+
+  /* 🌟 Logout button at bottom without clash */
+  aside {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  aside button {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  /* smooth input padding to match login UI */
+  .form-control, .form-select {
+    padding: 0.55rem 0.75rem;
+    background: rgba(0,0,0,0.55) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+  }
+
+  /* job list background */
+  .list-group-item {
+    background: rgba(0,0,0,0.45) !important;
+    border-radius: 10px !important;
+  }
+    /* Make all profile labels (strong) light grey */
+section strong {
+  color: #d6d6d6 !important;
+}
+
+/* Make normal text inside profile light grey */
+section div {
+  color: #d6d6d6 !important;
+}
+
+/* Change blue text-info to purple tint */
+.text-info {
+  color: #b388ff !important;
+}
+
+`}</style>
     </div>
   );
 }
