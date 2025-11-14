@@ -13,7 +13,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Events from "./pages/Events";
 import Donations from "./pages/Donations";
-import Jobs from "./pages/Jobs"
+import Jobs from "./pages/Jobs";
+import Discussion from "./pages/Discussion"
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -47,6 +48,8 @@ export default function App() {
         <Route path="/Jobs" element={<Jobs/>}/>
         
         
+        <Route path="/Discussions" element={<Discussion/>}/>
+
 
         <Route
           path="/admin"

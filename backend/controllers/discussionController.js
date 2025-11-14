@@ -12,7 +12,7 @@ const createPost = async (req, res) => {
       department,
       title,
       content,
-      authorId: user._id,
+      authorId: user.uid,
       authorName: user.name
     });
     await post.save();
@@ -47,7 +47,7 @@ const commentOnPost = async (req, res) => {
     const {uid} = req.user;
     const user = await User.findOne({ uid });
     const comment = {
-      authorId: user.id,
+      authorId: user.uid,
       authorName: user.name,
       content: req.body.content
     };
