@@ -1,18 +1,28 @@
-import Event from "../models/Event.js";
+import Event from "../models/event.js";
 import Registration from "../models/registration.js";
 import ExcelJS from "exceljs";
 import User from "../models/User.js";
+import upload from "../middleware/upload.js";
 
+
+// In route registration (see below) use upload.single("image")
+
+// Updated createEvent
         /* ******** PRIVATE ROUTES ********** */
 //  Create Event
 // @private route
+
 export const createEvent = async (req, res) => {
+  
   try {
+    
     const { title, description, date, venue, capacity } = req.body;
-    const { uid,role } = req.user;
-    const user = await User.findOne({ uid });
-    if (role !== "clubMember" && role !== "admin")
+    const { uid, role } = req.user;
+  //  const users = await User.find({ uid })
+    if (role !== "admin" && role !== "clubMember")
       return res.status(403).json({ message: "Only club members or admins can create events" });
+
+    //const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
     const event = await Event.create({
       title,
@@ -20,11 +30,14 @@ export const createEvent = async (req, res) => {
       date,
       venue,
       capacity,
-      createdBy: { uid, name:user.name, role }
+     // tags: tags ? JSON.parse(tags) : [],
+      
+     // createdBy: { uid, name: users.name, role }
     });
 
     res.status(201).json({ message: "Event created successfully", event });
   } catch (error) {
+    console.error("Error creating event:", error.message);
     res.status(500).json({ message: "Error creating event", error });
   }
 };
@@ -133,7 +146,7 @@ export const getEventRegistrations = async (req, res) => {
 
     res.json({
       event: {
-        id: event._id,
+        _id: event._id,
         title: event.title,
         date: event.date,
         venue: event.venue,
@@ -263,52 +276,46 @@ export const registerForEvent = async (req, res) => {
 // @public route
 export const getAllEvents = async (req, res) => {
   try {
-    const { status } = req.query; // optional: ?status=upcoming
+    const { status } = req.query;
     const currentDate = new Date();
 
     let filter = {};
+    if (status === "upcoming") filter = { date: { $gt: currentDate } };
+    if (status === "completed") filter = { date: { $lt: currentDate } };
 
-    // Optional filtering by status
-    if (status === "upcoming") {
-      filter = { date: { $gt: currentDate } };
-    } else if (status === "ongoing") {
-      filter = {
-        startDate: { $lte: currentDate },
-        endDate: { $gte: currentDate },
-      };
-    } else if (status === "completed") {
-      filter = { endDate: { $lt: currentDate } };
-    }
-
-    // Fetch all events based on filter
     const events = await Event.find(filter)
       .sort({ date: -1 })
-      .select("title description date venue createdBy status capacity") || [];
+      .select("title description date venue status capacity");
 
     if (!events.length) {
       return res.status(404).json({ message: "No events found" });
     }
 
-    // Format output for better clarity
-    const formattedEvents = events.map((event) => ({
-      id: event._id,
+    const formattedEvents = events.map((event) => {
+    console.log("BACKEND EVENT DATE:", event.date);  // <--- HERE
+
+    return {
+      _id: event._id,
       title: event.title,
       description: event.description,
       venue: event.venue,
       status: event.status,
-      createdBy: event.createdBy.name,
+      date: event.date,
       capacity: event.capacity,
-    })) || [];
+    };
+  }) || [];
+
 
     res.json({
       totalEvents: formattedEvents.length,
       events: formattedEvents,
     });
   } catch (error) {
-    console.error("Error fetching events:", error); // logs the actual error
+    console.error("Error fetching events:", error);
     res.status(500).json({ message: "Error fetching events", error: error.message });
   }
 };
+
 
 // get the info of the upcoming events
 // @public route

@@ -1,0 +1,50 @@
+/* MAIN LAYOUT WRAPPER (HORIZONTAL) */
+.admin-layout-wrapper {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 60px); /* subtract navbar height */
+  margin-top: 60px; /* space for navbar */
+}
+
+/* SIDEBAR FIXED ON LEFT */
+.sidebar {
+  width: 240px;
+  min-height: calc(100vh - 60px);
+  background: #000000;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  position: fixed;
+  top: 60px; /* BELOW NAVBAR */
+  left: 0;
+  z-index: 1000;
+}
+
+/* MAIN RIGHT SIDE (NOT COVERED BY SIDEBAR) */
+/* Ensure admin area is pushed below navbar */
+.admin-main {
+  margin-left: 230px; /* sidebar width */
+  margin-top: 60px;   /* 🔥 navbar height */
+  padding: 20px;
+}
+
+/* Page content spacing */
+.admin-content {
+  margin-top: 20px; /* optional padding below topbar */
+  padding: 20px;
+}
+
+
+/* TOPBAR */
+.topbar {
+  background: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+  padding: 12px;
+  position: sticky;
+  top: 60px;
+  z-index: 999;
+}
+
+/* PAGE CONTENT */
+.admin-content {
+  padding: 20px;
+}

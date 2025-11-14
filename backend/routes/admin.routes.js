@@ -2,29 +2,43 @@
 import express from "express";
 import verifyFirebaseToken from "../middleware/verifyFirebaseToken.js";
 import { authorizeRoles } from "../middleware/authorizeRole.js";
+
 import {
   getAllUsers,
   searchUsers,
   filterByRole,
   updateUserRole,
   verifyAlumni,
+  getAdminProfile,
+  getDashboardCounts,
 } from "../controllers/adminController.js";
 
+// ✅ Declare router FIRST
 const router = express.Router();
 
-// all routes protected by admin access
+// ✅ Protect all admin routes
 router.use(verifyFirebaseToken, authorizeRoles("admin"));
 
-// GET all users
+// -------------------------------
+// Admin Dashboard API Routes
+// -------------------------------
+
+// Admin profile
+router.get("/profile", getAdminProfile);
+
+// Dashboard counts
+router.get("/counts", getDashboardCounts);
+
+// Get all users
 router.get("/users", getAllUsers);
 
-// Search users by email or name
+// Search users
 router.get("/users/search", searchUsers);
 
-// Filter users by role (student / clubMember / alumni)
+// Filter users
 router.get("/users/filter/:role", filterByRole);
 
-// Promote student → clubMember
+// Update role
 router.put("/users/role", updateUserRole);
 
 // Verify alumni

@@ -211,7 +211,6 @@ export default function Signup() {
                   >
                     <option value="student" className="text-gray-900">Student</option>
                     <option value="alumni" className="text-gray-900">Alumni</option>
-                    <option value="admin" className="text-gray-900">Admin</option>
                   </select>
                 </div>
               </div>
@@ -253,7 +252,7 @@ export default function Signup() {
 
             {formData.role === 'student' && (
               <div>
-                <label className="block text-sm font-semibold text-white mb-2">Registration Number</label>
+                <label className="block text-sm font-semibold text-white mb-2">Graduation Year</label>
                 <div className="relative">
                   <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300" size={20} />
                   <input
@@ -261,7 +260,7 @@ export default function Signup() {
                     value={formData.regNo}
                     onChange={(e) => handleChange('regNo', e.target.value)}
                     className="form-input pl-10"
-                    placeholder="Enter Register No"
+                    placeholder="Enter Graduation Year"
                     required
                   />
                 </div>

@@ -1,0 +1,62 @@
+/* src/pages/Sidebar.css */
+
+.sidebar {
+  width: 230px;
+  background: #000000; /* 🔥 PURE BLACK */
+  color: #ffffff; /* default text color */
+  padding: 20px;
+
+  position: fixed;
+  top: 60px; /* place below fixed navbar */
+  left: 0;
+
+  height: calc(100vh - 60px);
+  z-index: 1500;
+
+  overflow-y: auto;
+}
+
+/* Title */
+.sidebar h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #ffffff; /* white */
+}
+
+/* List styles */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  padding: 12px 0;
+  cursor: pointer;
+  font-size: 15px;
+  color: #fff6f6; /* soft white */
+  transition: 0.2s;
+}
+
+/* Hover effect */
+.sidebar li:hover {
+  color: #60a5fa; /* blue highlight */
+}
+
+.sidebar p{
+    color:#00ffe5
+}
+
+/* Section title */
+.section-title {
+  margin-top: 25px;
+  color: #000000; /* grey */
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+/* Logout button styling */
+.logout {
+  margin-top: 40px;
+  color: #ef4444 !important; /* red logout */
+}

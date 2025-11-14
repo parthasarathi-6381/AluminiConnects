@@ -1,5 +1,5 @@
 
-
+import admin from "../firebase/firebaseAdmin.js";
 export const isClubMemberOrAdmin = (req, res, next) => {
   try {
     const { role } = req.user;

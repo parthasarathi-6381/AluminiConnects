@@ -36,6 +36,8 @@ export default function Login() {
       const profileRes = await fetch(`${API_BASE}/api/users/${user.uid}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
+      const token1 = await auth.currentUser.getIdToken();
+      console.log("TOKEN:", token1);
 
       if (!profileRes.ok) {
         throw new Error('Failed to fetch user profile')
