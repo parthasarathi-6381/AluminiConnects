@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
  const commentSchema = new mongoose.Schema({
-  authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  authorId: { type: String, required: true },
   authorName: String,
   content: String,
   createdAt: { type: Date, default: Date.now }
@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
   department: { type: String, enum: ['CSE','ECE','MECH','CIVIL','EEE'], required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
-  authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  authorId: { type: String , required: true },
   authorName: String,
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [commentSchema],

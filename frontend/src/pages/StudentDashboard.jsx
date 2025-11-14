@@ -38,7 +38,7 @@ export default function StudentDashboard(){
               {getInitials(profile?.name || profile?.email)}
             </div>
             <div className="profile-name">{profile?.name || 'Student User'}</div>
-            <div className="profile-title">{profile?.department}  Year:{profile?.yearOfStudy}</div>
+            <div className="profile-title">{profile?.department}  Year:{profile?.graduationYear -4} - {profile?.graduationYear}</div>
           </div>
           
         </div>
