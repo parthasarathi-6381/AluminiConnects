@@ -1,30 +1,32 @@
+// controllers/messageController.js
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import User from "../models/User.js";
 import Alumni from "../models/alumni.js";
 
+// 🔍 Helper: always check Alumni FIRST, then User
 const findUserByUid = async (uid) => {
-  let user = await Alumni.findOne({ uid });  // check alumni first
+  let user = await Alumni.findOne({ uid });
   if (!user) user = await User.findOne({ uid });
   return user;
 };
 
-
 // 🔎 Search alumni by name (student UI search)
 export const searchAlumni = async (req, res) => {
   try {
-    res.set('Cache-Control', 'no-store'); 
+    res.set("Cache-Control", "no-store"); // avoid 304 caching
+
     const { q } = req.query;
-    if (!q || q.trim() === "") return res.json([]);
+    if (!q || !q.trim()) return res.status(200).json([]);
 
     const alumni = await Alumni.find({
-      
-      name: { $regex: q, $options: "i" }
+      name: { $regex: q, $options: "i" },
     })
-      .select("uid name department graduationYear email")
-      .limit(20);
+      .select("uid name department graduationYear email role")
+      .limit(20)
+      .lean();
 
-    res.status(200).json(alumni);
+    return res.status(200).json(alumni);
   } catch (err) {
     console.error("searchAlumni error:", err);
     res.status(500).json({ message: "Error searching alumni" });
@@ -41,7 +43,12 @@ export const getOrCreateConversation = async (req, res) => {
       return res.status(400).json({ message: "otherUid is required" });
     }
 
-    // Get both users
+    if (otherUid === currentUid) {
+      return res
+        .status(400)
+        .json({ message: "You cannot start a conversation with yourself" });
+    }
+
     const currentUser = await findUserByUid(currentUid);
     const otherUser = await findUserByUid(otherUid);
 
@@ -49,14 +56,13 @@ export const getOrCreateConversation = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // ❌ Block alumni→alumni AND student→student
+    // allow ONLY student <-> alumni
     if (currentUser.role === otherUser.role) {
       return res.status(403).json({
-        message: "Messaging allowed only between students and alumni"
+        message: "Messaging allowed only between students and alumni",
       });
     }
 
-    // Create conversation
     const participants = [currentUid, otherUid].sort();
     let convo = await Conversation.findOne({ participants });
 
@@ -65,42 +71,49 @@ export const getOrCreateConversation = async (req, res) => {
       await convo.save();
     }
 
-    res.json(convo);
+    const convoObj = convo.toObject();
+    const other = {
+      uid: otherUid,
+      name: otherUser.name,
+      email: otherUser.email,
+      department: otherUser.department,
+      graduationYear: otherUser.graduationYear,
+      role: otherUser.role,
+    };
 
+    return res.status(200).json({ ...convoObj, other });
   } catch (err) {
     console.error("getOrCreateConversation error:", err);
     res.status(500).json({ message: "Error getting/creating conversation" });
   }
 };
 
-
 // 📋 List conversations for logged-in user
 export const getMyConversations = async (req, res) => {
-  try {
+  try{
     const uid = req.user.uid;
 
-   const convos = await Conversation.find({ participants: uid })
-  .sort({ updatedAt: -1 })
-  .lean();
+    let convos = await Conversation.find({ participants: uid })
+      .sort({ updatedAt: -1 })
+      .lean();
 
-for (let convo of convos) {
-  const otherUid = convo.participants.find(p => p !== uid);
+    // attach "other" info for UI (name, role, etc.)
+    for (let convo of convos) {
+      const otherUid = convo.participants.find((p) => p !== uid);
 
-  // Fetch name from both collections
-  const user = await User.findOne({ uid: otherUid }) ||
-               await Alumni.findOne({ uid: otherUid });
+      const otherUser = await findUserByUid(otherUid);
 
-     convo.other = {
-           uid: otherUid,
-           name: user?.name || "Unknown User",
-           email: user?.email,
-           department: user?.department,
-           graduationYear: user?.graduationYear,
-           role: user?.role
-     };
+      convo.other = {
+        uid: otherUid,
+        name: otherUser?.name || "Unknown User",
+        email: otherUser?.email,
+        department: otherUser?.department,
+        graduationYear: otherUser?.graduationYear,
+        role: otherUser?.role,
+      };
     }
 
-     res.json(convos);
+    return res.status(200).json(convos);
   } catch (err) {
     console.error("getMyConversations error:", err);
     res.status(500).json({ message: "Error fetching conversations" });
@@ -113,6 +126,10 @@ export const getMessages = async (req, res) => {
     const { conversationId } = req.params;
     const uid = req.user.uid;
 
+    if (!conversationId || conversationId === "undefined") {
+      return res.status(400).json({ message: "Valid conversationId required" });
+    }
+
     const convo = await Conversation.findById(conversationId);
     if (!convo || !convo.participants.includes(uid)) {
       return res.status(404).json({ message: "Conversation not found" });
@@ -122,19 +139,23 @@ export const getMessages = async (req, res) => {
       .sort({ createdAt: 1 })
       .lean();
 
-    res.json(msgs);
+    return res.status(200).json(msgs);
   } catch (err) {
     console.error("getMessages error:", err);
     res.status(500).json({ message: "Error fetching messages" });
   }
 };
 
-// ✉️ Fallback HTTP send (useful for testing without sockets)
+// ✉️ Optional: HTTP send (mainly for testing without sockets)
 export const sendMessageHttp = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const { text, toUid } = req.body;
     const senderUid = req.user.uid;
+
+    if (!conversationId || conversationId === "undefined") {
+      return res.status(400).json({ message: "Valid conversationId required" });
+    }
 
     if (!text || !toUid) {
       return res.status(400).json({ message: "text and toUid are required" });
@@ -145,7 +166,6 @@ export const sendMessageHttp = async (req, res) => {
       return res.status(404).json({ message: "Conversation not found" });
     }
 
-    // Load both users
     const sender = await findUserByUid(senderUid);
     const receiver = await findUserByUid(toUid);
 
@@ -153,14 +173,12 @@ export const sendMessageHttp = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // ❌ Reject student→student or alumni→alumni
     if (sender.role === receiver.role) {
       return res.status(403).json({
-        message: "Messaging allowed only between students and alumni"
+        message: "Messaging allowed only between students and alumni",
       });
     }
 
-    // Save message
     const msg = new Message({
       conversation: conversationId,
       senderUid,
@@ -170,16 +188,14 @@ export const sendMessageHttp = async (req, res) => {
 
     await msg.save();
 
-    // Update conversation last message
     convo.lastMessage = text;
     convo.lastSenderUid = senderUid;
+    convo.updatedAt = new Date();
     await convo.save();
 
-    res.status(201).json(msg);
-
+    return res.status(201).json(msg);
   } catch (err) {
     console.error("sendMessageHttp error:", err);
     res.status(500).json({ message: "Error sending message" });
   }
 };
-

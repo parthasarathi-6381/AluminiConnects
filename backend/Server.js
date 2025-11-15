@@ -6,24 +6,30 @@ import app from "./app.js";
 import connectDB from "./config/db.js";
 import admin from "./firebase/firebaseAdmin.js";
 
-// Chat models
 import Conversation from "./models/Conversation.js";
 import Message from "./models/Message.js";
+import User from "./models/User.js";
+import Alumni from "./models/alumni.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 
-// Store online users: uid -> socketId
+// Track online users
 const onlineUsers = new Map();
+
+// Helper: find user in BOTH collections
+const findUserByUid = async (uid) => {
+  let user = await Alumni.findOne({ uid });
+  if (!user) user = await User.findOne({ uid });
+  return user;
+};
 
 const startServer = async () => {
   try {
     await connectDB();
 
-    // Create raw HTTP server (important for socket.io)
     const server = http.createServer(app);
 
-    // Setup socket.io
     const io = new Server(server, {
       cors: {
         origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
@@ -31,37 +37,42 @@ const startServer = async () => {
       },
     });
 
-    // 🔐 SOCKET AUTH with Firebase token
+    // Authenticate socket with Firebase token
     io.use(async (socket, next) => {
       try {
         const token = socket.handshake.auth?.token;
-        if (!token) return next(new Error("No auth token provided"));
+        if (!token) return next(new Error("No auth token"));
 
         const decoded = await admin.auth().verifyIdToken(token);
-
-        socket.user = decoded; // { uid, email, role, verified… }
+        socket.user = decoded;
         next();
       } catch (err) {
-        console.error("❌ Socket Authentication Failed", err.message);
-        next(new Error("Authentication error"));
+        console.error("❌ Socket Auth Error:", err.message);
+        next(new Error("Authentication failed"));
       }
     });
 
-    // 🔌 When user connects
+    // Connection event
     io.on("connection", (socket) => {
       const uid = socket.user.uid;
       console.log(`⚡ User connected: ${uid}`);
 
       onlineUsers.set(uid, socket.id);
 
-      // 📩 Receive private message
       socket.on("private_message", async ({ toUid, text }) => {
         try {
-          if (!toUid || !text) return;
+          if (!toUid || !text?.trim()) return;
 
           const fromUid = uid;
 
-          // find or create a conversation (always sort participants)
+          // Only allow student <-> alumni
+          const sender = await findUserByUid(fromUid);
+          const receiver = await findUserByUid(toUid);
+
+          if (!sender || !receiver) return;
+          if (sender.role === receiver.role) return;
+
+          // Create / find conversation
           const participants = [fromUid, toUid].sort();
           let convo = await Conversation.findOne({ participants });
 
@@ -75,48 +86,41 @@ const startServer = async () => {
             conversation: convo._id,
             senderUid: fromUid,
             receiverUid: toUid,
-            text,
+            text: text.trim(),
           });
 
           await msg.save();
 
-          // Update conversation info
-          convo.lastMessage = text;
+          // Update conversation preview
+          convo.lastMessage = text.trim();
           convo.lastSenderUid = fromUid;
+          convo.updatedAt = new Date(); // ⭐ FIXED
           await convo.save();
 
-          // Build payload
           const payload = {
-            _id: msg._id,
-            conversation: convo._id,
-            senderUid: fromUid,
-            receiverUid: toUid,
-            text,
-            createdAt: msg.createdAt,
+            ...msg.toObject(),
+            conversation: convo._id, // ⭐ ALWAYS include convo ID
           };
 
-          // Send back confirmation to sender
+          // Send to sender
           socket.emit("private_message_sent", payload);
 
-          // Send to receiver (if online)
-          const receiverSocketId = onlineUsers.get(toUid);
-          if (receiverSocketId) {
-            io.to(receiverSocketId).emit("private_message", payload);
+          // Send to receiver if online
+          const receiverSocket = onlineUsers.get(toUid);
+          if (receiverSocket) {
+            io.to(receiverSocket).emit("private_message", payload);
           }
         } catch (err) {
           console.error("❌ Error sending message:", err);
-          socket.emit("error_message", "Failed to send message");
         }
       });
 
-      // 📴 When user disconnects
       socket.on("disconnect", () => {
         console.log(`🔌 User disconnected: ${uid}`);
         onlineUsers.delete(uid);
       });
     });
 
-    // Start both Express + Socket.io
     server.listen(PORT, () => {
       console.log(`🚀 Server running with WebSockets on port ${PORT}`);
     });
