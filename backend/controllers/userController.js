@@ -1,48 +1,38 @@
 // controllers/userController.js
 import User from "../models/User.js";
+import Alumni  from "../models/alumni.js";
 import admin from "../firebase/firebaseAdmin.js";
 import { validateUserInput } from "../utils/validators.js";
 export const createUser = async (req, res) => {
   console.log("Create user triggered");
   try {
-     // validates the incoming data
-     console.log("Validate user!!!!", req.body);
-    /*  const { error } = validateUserInput(req.body);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: error.details.map((err) => err.message),
-      });
-    }*/
-    console.log("Account creation triggerd")
-   const { name, department, graduationYear } = req.body;
+    const { name, department, graduationYear } = req.body;
     if (!department || !graduationYear) {
-         return res.status(400).json({ message: "Profile incomplete" });
-       }
-     const decoded = req.user;  //  decoded Firebase token from middleware
-    const { uid, email } = decoded;
-    const existingUser = await User.findOne({ email});
-    if (existingUser) {
-       return res.status(409).json({ message: "User already exists" });
-        }
-    //  Determine user type based on email domain
-    const emailDomain = email.split("@")[1];
-    const isCollegeEmail = emailDomain === "citchennai.net"; // change to your domain
-
-    let role = "alumni";  
-    let verified = false;
-
-    if (isCollegeEmail) {
-      role = "student";
-      verified = true; // students don’t need admin verification
+      return res.status(400).json({ message: "Profile incomplete" });
     }
 
-    // Check if user already exists
-    let user = await User.findOne({ uid });
-    
-    if (!user) {
-      user = new User({
+    const decoded = req.user;
+    const { uid, email } = decoded;
+
+    // Check duplicate in both collections
+    const existingUser = await User.findOne({ uid });
+    const existingAlumni = await Alumni.findOne({ uid });
+
+    if (existingUser || existingAlumni) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
+    // Determine role
+    const emailDomain = email.split("@")[1];
+    const isCollegeEmail = emailDomain === "citchennai.net";
+
+    let role = isCollegeEmail ? "student" : "alumni";
+    let verified = isCollegeEmail; // students auto-verified
+
+    let newUser;
+
+    if (role === "student") {
+      newUser = new User({
         uid,
         email,
         name,
@@ -51,50 +41,97 @@ export const createUser = async (req, res) => {
         role,
         verified,
       });
-      await user.save();
-
-      //  Set Firebase custom claims for consistent roles
-      await admin.auth().setCustomUserClaims(uid, { role, verified });
+    } else {
+      newUser = new Alumni({
+        uid,
+        email,
+        name,
+        department,
+        graduationYear,
+        role,
+        verified,
+      });
     }
-    
-    res.status(201).json({ message: "User registered", user });
+
+    await newUser.save();
+
+    // Set Firebase custom claims
+    await admin.auth().setCustomUserClaims(uid, { role, verified });
+
+    res.status(201).json({
+      message: `${role} registered successfully`,
+      user: newUser,
+    });
+
   } catch (err) {
     console.error("Error creating user:", err);
     res.status(500).json({ message: "Error creating user", error: err.message });
   }
 };
 
+
 //  Get logged-in user profile
 export const getProfile = async (req, res) => {
   try {
     const { uid } = req.params;
-      if (!uid)
+
+    if (!uid) {
       return res.status(400).json({ message: "UID is required" });
+    }
 
-    if (req.user.uid !== uid)
+    // Check if the requesting user is the same as the profile UID
+    if (req.user.uid !== uid) {
       return res.status(403).json({ message: "Unauthorized" });
+    }
 
-    const user = await User.findOne({ uid });
+    // First check User (student)
+    let user = await User.findOne({ uid });
 
-    if (!user)
+    // If not found in User, check Alumni
+    if (!user) {
+      user = await Alumni.findOne({ uid });
+    }
+
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
 
     res.status(200).json(user);
 
   } catch (error) {
     console.error("Error fetching profile:", error);
-    res.status(500).json({ message: "Error fetching profile", error: error.message });
+    res.status(500).json({
+      message: "Error fetching profile",
+      error: error.message
+    });
   }
 };
+
 
 // check existing user
 
 export const checkExistingUser = async (req, res) => {
   console.log("check existing user is triggered!!");
   try {
-    const user = await User.findOne({ uid: req.params.uid });
-    res.json({ exists: !!user });
+    const { uid } = req.params;
+
+    if (!uid) {
+      return res.status(400).json({ message: "UID is required" });
+    }
+
+    // Search in both collections
+    const user = await User.findOne({ uid });
+    const alumni = await Alumni.findOne({ uid });
+
+    const exists = !!user || !!alumni;
+
+    res.json({ exists });
+
   } catch (err) {
-    res.status(500).json({ message: "Error checking user", error: err });
+    console.error("Error checking user:", err);
+    res.status(500).json({
+      message: "Error checking user",
+      error: err.message
+    });
   }
 };

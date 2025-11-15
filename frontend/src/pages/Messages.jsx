@@ -20,126 +20,121 @@ export default function Messages() {
   const [loadingMessages, setLoadingMessages] = useState(false);
 
   const socketRef = useRef(null);
-
+  const messagesEndRef = useRef(null);
   const myUid = currentUser?.uid;
 
-  // helper: find the other person's uid in a conversation
-  const getOtherUid = (convo) => {
-    if (!convo || !convo.participants) return null;
-    return convo.participants.find((uid) => uid !== myUid);
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
-  // 🔌 Setup Socket.io connection
+  useEffect(scrollToBottom, [messages]);
+
+  const getOther = (convo) => convo?.other;
+
+  // SOCKET.IO CONNECTION
   useEffect(() => {
     if (!currentUser) return;
-
-    let isMounted = true;
 
     const setupSocket = async () => {
       const token = await currentUser.getIdToken();
 
-      const socket = io(API_BASE, {
-        auth: { token },
-      });
-
+      const socket = io(API_BASE, { auth: { token } });
       socketRef.current = socket;
 
-      socket.on("connect", () => {
-        console.log("✅ Connected to chat socket");
-      });
+      socket.on("connect", () => console.log("✅ Connected to chat socket"));
 
+      // RECEIVE MESSAGE
       socket.on("private_message", (msg) => {
         console.log("📩 Incoming message", msg);
 
-        // if we are in the same conversation, append to messages
-        setMessages((prev) => {
-          if (selectedConvo && msg.conversation === selectedConvo._id) {
-            return [...prev, msg];
-          }
-          return prev;
-        });
+        // update messages in the open chat
+        if (selectedConvo && msg.conversation === selectedConvo._id) {
+          setMessages((prev) => [...prev, msg]);
 
-        // optional: update conversation preview text
+          // ALSO update selectedConvo preview
+          setSelectedConvo((prev) => ({
+            ...prev,
+            lastMessage: msg.text,
+            updatedAt: msg.createdAt,
+          }));
+        }
+
+        // update conversation list
         setConversations((prev) =>
           prev.map((c) =>
             c._id === msg.conversation
-              ? { ...c, lastMessage: msg.text, lastSenderUid: msg.senderUid, updatedAt: msg.createdAt }
+              ? { ...c, lastMessage: msg.text, updatedAt: msg.createdAt }
               : c
           )
         );
       });
 
+      // SENT MESSAGE CONFIRMATION
       socket.on("private_message_sent", (msg) => {
-        console.log("📤 Message sent confirmed", msg);
+        console.log("📤 Sent confirmed", msg);
 
-        // optimistic update for sender
-        setMessages((prev) => {
-          if (selectedConvo && msg.conversation === selectedConvo._id) {
-            // avoid duplicate if already added
+        if (selectedConvo && msg.conversation === selectedConvo._id) {
+          setMessages((prev) => {
             const exists = prev.some((m) => m._id === msg._id);
-            if (!exists) return [...prev, msg];
-          }
-          return prev;
-        });
+            return exists ? prev : [...prev, msg];
+          });
+
+          setSelectedConvo((prev) => ({
+            ...prev,
+            lastMessage: msg.text,
+            updatedAt: msg.createdAt,
+          }));
+        }
 
         setConversations((prev) =>
           prev.map((c) =>
             c._id === msg.conversation
-              ? { ...c, lastMessage: msg.text, lastSenderUid: msg.senderUid, updatedAt: msg.createdAt }
+              ? { ...c, lastMessage: msg.text, updatedAt: msg.createdAt }
               : c
           )
         );
-      });
-
-      socket.on("disconnect", () => {
-        console.log("❌ Disconnected from chat socket");
       });
     };
 
     setupSocket();
 
     return () => {
-      isMounted = false;
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
+      if (socketRef.current) socketRef.current.disconnect();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser]);
+  }, [currentUser, selectedConvo]);
 
-  // 🔁 Fetch my conversations
+  // FETCH CONVERSATIONS
   useEffect(() => {
     const fetchConversations = async () => {
       if (!currentUser) return;
       setLoadingConvos(true);
+
       try {
         const token = await currentUser.getIdToken();
         const res = await fetch(`${API_BASE}/api/messages/conversations`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
         setConversations(data || []);
       } catch (err) {
         console.error("Error fetching conversations", err);
       }
+
       setLoadingConvos(false);
     };
 
     fetchConversations();
   }, [currentUser]);
 
-  // 🔁 Load messages when selecting a conversation
+  // LOAD MESSAGES
   const loadMessages = async (convo) => {
-    if (!currentUser || !convo) return;
     setLoadingMessages(true);
     try {
       const token = await currentUser.getIdToken();
       const res = await fetch(`${API_BASE}/api/messages/${convo._id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       setMessages(data || []);
@@ -154,7 +149,7 @@ export default function Messages() {
     await loadMessages(convo);
   };
 
-  // 🧠 Search alumni by name
+  // SEARCH
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -164,11 +159,7 @@ export default function Messages() {
       const token = await currentUser.getIdToken();
       const res = await fetch(
         `${API_BASE}/api/messages/search-alumni?q=${encodeURIComponent(searchQuery)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
       setSearchResults(data || []);
@@ -178,7 +169,7 @@ export default function Messages() {
     setSearchLoading(false);
   };
 
-  // 🧵 Start conversation with a searched alumni
+  // START NEW CHAT
   const startConversationWithAlumni = async (alumni) => {
     try {
       const token = await currentUser.getIdToken();
@@ -193,43 +184,41 @@ export default function Messages() {
 
       const convo = await res.json();
 
-      // merge in conversations list if new
-      setConversations((prev) => {
-        const exists = prev.some((c) => c._id === convo._id);
-        if (!exists) return [convo, ...prev];
-        return prev;
-      });
+      setConversations((prev) =>
+        prev.some((c) => c._id === convo._id) ? prev : [convo, ...prev]
+      );
 
       setSelectedConvo(convo);
       setSearchResults([]);
       setSearchQuery("");
+
       await loadMessages(convo);
     } catch (err) {
       console.error("Error starting conversation", err);
     }
   };
 
-  // ✉️ Send message through socket
-  const handleSendMessage = async (e) => {
+  // SEND MESSAGE
+  const handleSendMessage = (e) => {
     e.preventDefault();
-    if (!messageText.trim() || !selectedConvo || !socketRef.current) return;
-
+    if (!messageText.trim() || !socketRef.current) return;
     const text = messageText.trim();
-    const toUid = getOtherUid(selectedConvo);
 
     socketRef.current.emit("private_message", {
-      toUid,
+      toUid: getOther(selectedConvo)?.uid,
       text,
     });
 
     setMessageText("");
   };
 
-  // UI helpers
+  // TIME
   const formatTime = (iso) => {
     if (!iso) return "";
-    const d = new Date(iso);
-    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return new Date(iso).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const isMine = (msg) => msg.senderUid === myUid;
@@ -237,11 +226,11 @@ export default function Messages() {
   return (
     <div className="container-fluid min-vh-100 bg-dark text-light py-3">
       <div className="row h-100">
-        {/* LEFT: Conversations + Search */}
+        {/* LEFT */}
         <div className="col-md-4 border-end border-secondary">
           <h4 className="mb-3">Messages</h4>
 
-          {/* Search alumni */}
+          {/* SEARCH */}
           <form className="d-flex mb-3" onSubmit={handleSearch}>
             <input
               className="form-control me-2 bg-dark text-light border-secondary"
@@ -249,57 +238,53 @@ export default function Messages() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <button className="btn btn-outline-light" disabled={searchLoading}>
+            <button className="btn btn-outline-light">
               {searchLoading ? "..." : "Search"}
             </button>
           </form>
 
-          {/* Search results */}
           {searchResults.length > 0 && (
-            <div className="mb-3">
-              <div className="small text-muted mb-1">Search Results</div>
-              <ul className="list-group">
-                {searchResults.map((alumni) => (
-                  <li
-                    key={alumni.uid}
-                    className="list-group-item list-group-item-action bg-dark text-light d-flex justify-content-between align-items-center"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => startConversationWithAlumni(alumni)}
-                  >
-                    <div>
-                      <div>{alumni.name}</div>
-                      <div className="small text-muted">
-                        {alumni.department} • {alumni.graduationYear}
-                      </div>
-                    </div>
-                    <span className="badge bg-primary">Message</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ul className="list-group mb-2">
+              {searchResults.map((al) => (
+                <li
+                  key={al.uid}
+                  className="list-group-item bg-dark text-light"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => startConversationWithAlumni(al)}
+                >
+                  <strong>{al.name}</strong>
+                  <br />
+                  <span className="small text-muted">
+                    {al.department} • {al.graduationYear}
+                  </span>
+                </li>
+              ))}
+            </ul>
           )}
 
           <hr className="border-secondary" />
 
-          {/* Conversation list */}
+          {/* CONVERSATIONS */}
           <div style={{ maxHeight: "65vh", overflowY: "auto" }}>
-            {loadingConvos && <div className="small">Loading conversations...</div>}
-            {!loadingConvos && conversations.length === 0 && (
-              <div className="small text-muted">No conversations yet. Start one from search.</div>
-            )}
-
             {conversations.map((convo) => {
-              const otherUid = getOtherUid(convo);
-              const isActive = selectedConvo && selectedConvo._id === convo._id;
+              const other = getOther(convo);
+              const active = selectedConvo?._id === convo._id;
+
               return (
                 <div
                   key={convo._id}
-                  className={`p-2 mb-1 rounded ${isActive ? "bg-primary" : "bg-secondary bg-opacity-25"}`}
-                  style={{ cursor: "pointer" }}
+                  className={`p-2 mb-1 rounded ${
+                    active ? "bg-primary" : "bg-secondary bg-opacity-25"
+                  }`}
                   onClick={() => handleSelectConversation(convo)}
+                  style={{ cursor: "pointer" }}
                 >
-                  <div className="fw-bold">Chat with: {otherUid}</div>
-                  <div className="small text-truncate">{convo.lastMessage || "No messages yet"}</div>
+                  <div className="fw-bold">
+                    Chat with: {other?.name || other?.uid}
+                  </div>
+                  <div className="small text-truncate">
+                    {convo.lastMessage || "No messages yet"}
+                  </div>
                   <div className="small text-muted">
                     {convo.updatedAt && formatTime(convo.updatedAt)}
                   </div>
@@ -309,33 +294,22 @@ export default function Messages() {
           </div>
         </div>
 
-        {/* RIGHT: Chat window */}
+        {/* RIGHT */}
         <div className="col-md-8 d-flex flex-column">
           {!selectedConvo ? (
             <div className="d-flex flex-grow-1 align-items-center justify-content-center text-muted">
-              Select a conversation or search an alumni to start chatting.
+              Select a conversation to start chatting.
             </div>
           ) : (
             <>
-              {/* Chat header */}
               <div className="py-2 border-bottom border-secondary">
-                <h5 className="mb-0">
-                  Chat with: {getOtherUid(selectedConvo)}
-                </h5>
+                <h5 className="mb-0">Chat with: {selectedConvo.other?.name}</h5>
               </div>
 
-              {/* Messages list */}
               <div
                 className="flex-grow-1 py-3"
                 style={{ overflowY: "auto", maxHeight: "70vh" }}
               >
-                {loadingMessages && <div className="small">Loading messages...</div>}
-                {!loadingMessages && messages.length === 0 && (
-                  <div className="small text-muted text-center">
-                    No messages yet. Say hi 👋
-                  </div>
-                )}
-
                 {messages.map((msg) => (
                   <div
                     key={msg._id}
@@ -345,20 +319,22 @@ export default function Messages() {
                   >
                     <div
                       className={`px-3 py-2 rounded-4 ${
-                        isMine(msg) ? "bg-primary text-white" : "bg-secondary bg-opacity-50"
+                        isMine(msg)
+                          ? "bg-primary text-white"
+                          : "bg-secondary bg-opacity-50"
                       }`}
                       style={{ maxWidth: "70%" }}
                     >
                       <div>{msg.text}</div>
-                      <div className="small text-end text-light opacity-75">
+                      <div className="small text-end opacity-75">
                         {formatTime(msg.createdAt)}
                       </div>
                     </div>
                   </div>
                 ))}
+                <div ref={messagesEndRef} />
               </div>
 
-              {/* Input box */}
               <form onSubmit={handleSendMessage} className="mt-2">
                 <div className="input-group">
                   <input
@@ -367,9 +343,7 @@ export default function Messages() {
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                   />
-                  <button className="btn btn-primary" type="submit">
-                    Send
-                  </button>
+                  <button className="btn btn-primary">Send</button>
                 </div>
               </form>
             </>
