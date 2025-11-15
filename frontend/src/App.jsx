@@ -27,6 +27,9 @@ import ManageAlumni from "./pages/ManageAlumni";
 import EventsDashboard from "./pages/Events";
 
 
+import Messages from "./pages/Messages.jsx";
+// import ProtectedRoute from "./components/ProtectedRoute.jsx";
+
 export default function App() {
   const { profile } = useAuth();
   const location = useLocation();
@@ -79,6 +82,15 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <Messages />
+            </ProtectedRoute>
+          }
+/>
 
         <Route
           path="/student"
