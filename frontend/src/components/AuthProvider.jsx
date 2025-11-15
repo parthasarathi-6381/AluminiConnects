@@ -22,10 +22,10 @@ export function AuthProvider({ children }) {
       if (user) {
         try {
           const token = await user.getIdToken();
-          // Store token in localStorage for axios usage
           localStorage.setItem("authToken", token);
 
-          const res = await fetch(`${API_BASE}/api/admin/profile`, {
+          // 🔥 UNIVERSAL PROFILE ROUTE (works for all roles)
+          const res = await fetch(`${API_BASE}/api/users/${user.uid}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
             setProfile(null);
           }
         } catch (err) {
-          console.error("Failed to fetch backend profile", err);
+          console.error("Failed to fetch profile", err);
           setProfile(null);
         }
       } else {
@@ -52,10 +52,8 @@ export function AuthProvider({ children }) {
     return () => unsub();
   }, []);
 
-  const value = { currentUser, profile, setProfile };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ currentUser, profile, setProfile }}>
       {!loading && children}
     </AuthContext.Provider>
   );

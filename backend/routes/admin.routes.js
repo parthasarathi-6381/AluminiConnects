@@ -11,6 +11,7 @@ import {
   verifyAlumni,
   getAdminProfile,
   getDashboardCounts,
+  deleteAlumni
 } from "../controllers/adminController.js";
 
 // ✅ Declare router FIRST
@@ -43,5 +44,7 @@ router.put("/users/role", updateUserRole);
 
 // Verify alumni
 router.put("/users/verify", verifyAlumni);
+
+router.delete("/users/:uid", deleteAlumni);
 
 export default router;
