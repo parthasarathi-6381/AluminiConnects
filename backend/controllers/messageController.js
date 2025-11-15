@@ -12,7 +12,7 @@ const findUserByUid = async (uid) => {
 };
 
 // 🔎 Search alumni by name (student UI search)
-export const searchAlumni = async (req, res) => {
+ /*export const searchAlumni = async (req, res) => {
   try {
     res.set("Cache-Control", "no-store"); // avoid 304 caching
 
@@ -31,7 +31,27 @@ export const searchAlumni = async (req, res) => {
     console.error("searchAlumni error:", err);
     res.status(500).json({ message: "Error searching alumni" });
   }
-};
+};*/
+
+/*export const searchStudents = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || !q.trim()) return res.json([]);
+
+    const students = await User.find({
+      role: "student",
+      name: { $regex: q, $options: "i" }
+    })
+      .select("uid name department graduationYear email role")
+      .limit(20);
+
+    res.json(students);
+  } catch (err) {
+    console.error("searchStudents error:", err);
+    res.status(500).json({ message: "Error searching students" });
+  }
+};*/
+
 
 // 📌 Get or create conversation between current user and another user
 export const getOrCreateConversation = async (req, res) => {
@@ -57,11 +77,11 @@ export const getOrCreateConversation = async (req, res) => {
     }
 
     // allow ONLY student <-> alumni
-    if (currentUser.role === otherUser.role) {
+    /*if (currentUser.role === otherUser.role) {
       return res.status(403).json({
         message: "Messaging allowed only between students and alumni",
       });
-    }
+    }*/
 
     const participants = [currentUid, otherUid].sort();
     let convo = await Conversation.findOne({ participants });
@@ -173,11 +193,11 @@ export const sendMessageHttp = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (sender.role === receiver.role) {
+    /*if (sender.role === receiver.role) {
       return res.status(403).json({
         message: "Messaging allowed only between students and alumni",
       });
-    }
+    }*/
 
     const msg = new Message({
       conversation: conversationId,
@@ -197,5 +217,30 @@ export const sendMessageHttp = async (req, res) => {
   } catch (err) {
     console.error("sendMessageHttp error:", err);
     res.status(500).json({ message: "Error sending message" });
+  }
+};
+
+export const searchUsers = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim() === "") return res.json([]);
+
+    const results = [
+      ...(await User.find({
+        name: { $regex: q, $options: "i" }
+      }).select("uid name email department graduationYear role")),
+
+      ...(await Alumni.find({
+        name: { $regex: q, $options: "i" }
+      }).select("uid name email department graduationYear role")),
+    ];
+
+    // exclude self
+    const filtered = results.filter(u => u.uid !== req.user.uid);
+
+    res.json(filtered);
+  } catch (err) {
+    console.error("searchUsers error:", err);
+    res.status(500).json({ message: "Error searching users" });
   }
 };

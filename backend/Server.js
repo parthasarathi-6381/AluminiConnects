@@ -70,7 +70,7 @@ const startServer = async () => {
           const receiver = await findUserByUid(toUid);
 
           if (!sender || !receiver) return;
-          if (sender.role === receiver.role) return;
+         // if (sender.role === receiver.role) return;
 
           // Create / find conversation
           const participants = [fromUid, toUid].sort();
