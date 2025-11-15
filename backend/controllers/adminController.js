@@ -127,3 +127,27 @@ export const getDashboardCounts = async (req, res) => {
     res.status(500).json({ message: "Error fetching counts", error });
   }
 };
+
+export const deleteAlumni = async (req, res) => {
+  const { uid } = req.params;
+
+  try {
+    // Check if alumni exists
+    const alumni = await User.findOne({ uid, role: "alumni" });
+
+    if (!alumni) {
+      return res.status(404).json({ message: "Alumni not found" });
+    }
+
+    // Delete from MongoDB
+    await User.deleteOne({ uid });
+
+    // Delete account from Firebase Auth
+    await admin.auth().deleteUser(uid);
+
+    res.json({ message: "Alumni deleted successfully" });
+  } catch (error) {
+    console.error("Delete Alumni Error:", error);
+    res.status(500).json({ message: "Error deleting alumni", error });
+  }
+};
