@@ -33,6 +33,7 @@ export default function App() {
 
   // Hide navbar on login + signup pages
   const hideNavbarPaths = ["/login", "/signup","/forgot-password"];
+  const hideNavbarPaths = ["/login", "/signup"];
   const shouldShowNavbar = !hideNavbarPaths.includes(location.pathname) && profile;
 
   return (
