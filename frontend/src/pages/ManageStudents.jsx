@@ -1,42 +1,79 @@
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
-import "./AdminLayout.css";
+import "./ManageStudents.css";
 
 export default function ManageStudents() {
-  const [students, setStudents] = useState([]);
+  const [users, setUsers] = useState([]);
   const [query, setQuery] = useState("");
+  const [view, setView] = useState("students"); // "students" | "clubMembers"
 
-  async function load() {
+  async function loadStudents() {
     const res = await api.get("/api/admin/users/filter/student");
-    setStudents(res.data);
+    setUsers(res.data);
+    setView("students");
+  }
+
+  async function loadClubMembers() {
+    const res = await api.get("/api/admin/users/filter/clubMember");
+    setUsers(res.data);
+    setView("clubMembers");
   }
 
   async function search() {
     const res = await api.get(`/api/admin/users/search?q=${query}`);
-    setStudents(res.data.filter(u => u.role === "student"));
+    const filtered = res.data.filter(u =>
+      view === "students"
+        ? u.role === "student"
+        : u.role === "clubMember"
+    );
+    setUsers(filtered);
   }
 
   async function promote(uid) {
     await api.put("/api/admin/users/role", { uid, newRole: "clubMember" });
-    load();
+    loadStudents(); // refresh student list
+  }
+
+  async function demote(uid) {
+    await api.put("/api/admin/users/role", { uid, newRole: "student" });
+    loadClubMembers(); // refresh clubMember list
   }
 
   useEffect(() => {
-    load();
+    loadStudents(); // default view
   }, []);
 
   return (
-    <div>
-      <h2>Manage Students</h2>
+    <div className="manage-students-page">
+      <h2>Manage Students & Club Members</h2>
 
+      {/* Toggle buttons */}
+      <div className="toggle-buttons">
+        <button
+          className={view === "students" ? "active" : ""}
+          onClick={loadStudents}
+        >
+          Show Students
+        </button>
+
+        <button
+          className={view === "clubMembers" ? "active" : ""}
+          onClick={loadClubMembers}
+        >
+          Show Club Members
+        </button>
+      </div>
+
+      {/* Search */}
       <input
-        placeholder="Search student..."
+        placeholder={`Search ${view === "students" ? "students" : "club members"}...`}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
 
       <button onClick={search}>Search</button>
 
+      {/* Table */}
       <table className="users-table">
         <thead>
           <tr>
@@ -45,13 +82,22 @@ export default function ManageStudents() {
         </thead>
 
         <tbody>
-          {students.map((s) => (
-            <tr key={s.uid}>
-              <td>{s.name}</td>
-              <td>{s.email}</td>
-              <td>{s.role}</td>
+          {users.map((u) => (
+            <tr key={u.uid}>
+              <td>{u.name}</td>
+              <td>{u.email}</td>
+              <td>{u.role}</td>
+
               <td>
-                <button onClick={() => promote(s.uid)}>Promote</button>
+                {view === "students" ? (
+                  <button className="promote-btn" onClick={() => promote(u.uid)}>
+                    Promote
+                  </button>
+                ) : (
+                  <button className="demote-btn" onClick={() => demote(u.uid)}>
+                    Demote
+                  </button>
+                )}
               </td>
             </tr>
           ))}
