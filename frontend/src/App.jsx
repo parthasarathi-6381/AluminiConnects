@@ -26,6 +26,9 @@ import AlumniDashboard from "./pages/AlumniDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import CompleteProfile from "./pages/CompleteProfile";
 
+import Messages from "./pages/Messages.jsx";
+// import ProtectedRoute from "./components/ProtectedRoute.jsx";
+
 export default function App() {
   const { profile } = useAuth();
   const location = useLocation();
@@ -81,6 +84,15 @@ export default function App() {
         />
 
         {/* Students */}
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <Messages />
+            </ProtectedRoute>
+          }
+/>
+
         <Route
           path="/student"
           element={

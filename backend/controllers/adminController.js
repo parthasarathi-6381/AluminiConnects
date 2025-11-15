@@ -1,6 +1,7 @@
 // controllers/adminController.js
 import admin from "../firebase/firebaseAdmin.js";
 import User from "../models/User.js";
+import Alumni from "../models/alumni.js";
 import Event from "../models/event.js";
 
 
@@ -10,8 +11,10 @@ import Event from "../models/event.js";
 // -------------------------------
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().sort({ createdAt: -1 });
-    res.json(users);
+    const students = await User.find().sort({ createdAt: -1 });
+    const alumni = await Alumni.find().sort({ createdAt: -1 });
+
+    res.json([...students, ...alumni]);
   } catch (error) {
     res.status(500).json({ message: "Error fetching users", error });
   }
@@ -21,45 +24,74 @@ export const getAllUsers = async (req, res) => {
 export const searchUsers = async (req, res) => {
   const { q } = req.query;
   try {
-    const users = await User.find({
+    const students = await User.find({
       $or: [
         { name: { $regex: q, $options: "i" } },
-        { email: { $regex: q, $options: "i" } },
-      ],
+        { email: { $regex: q, $options: "i" } }
+      ]
     });
-    res.json(users);
+
+    const alumni = await Alumni.find({
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } }
+      ]
+    });
+
+    res.json([...students, ...alumni]);
   } catch (error) {
     res.status(500).json({ message: "Error searching users", error });
   }
 };
 
+
 // Filter users
 export const filterByRole = async (req, res) => {
   const { role } = req.params;
+
   try {
-    const users = await User.find({
-      role: { $regex: `^${role}$`, $options: "i" },
-    });
-    res.json(users);
+    if (role.toLowerCase() === "student") {
+      const students = await User.find({ role: "student" });
+      return res.json(students);
+    }
+
+    if (role.toLowerCase() === "alumni") {
+      const alumni = await Alumni.find({ role: "alumni" });
+      return res.json(alumni);
+    }
+
+    res.status(400).json({ message: "Invalid role" });
+
   } catch (error) {
     res.status(500).json({ message: "Error filtering users", error });
   }
 };
+
 
 // Update role
 export const updateUserRole = async (req, res) => {
   const { uid, newRole } = req.body;
 
   try {
-    const valid = ["student", "clubMember", "admin"];
+    const valid = ["student", "clubMember", "admin", "alumni"];
     if (!valid.includes(newRole))
       return res.status(400).json({ message: "Invalid role" });
 
-    const user = await User.findOneAndUpdate(
+    // Try updating student
+    let user = await User.findOneAndUpdate(
       { uid },
       { role: newRole },
       { new: true }
     );
+
+    // If not student, try alumni
+    if (!user) {
+      user = await Alumni.findOneAndUpdate(
+        { uid },
+        { role: newRole },
+        { new: true }
+      );
+    }
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -67,19 +99,22 @@ export const updateUserRole = async (req, res) => {
       role: newRole,
       verified: user.verified,
     });
+
     await admin.auth().revokeRefreshTokens(uid);
 
     res.json({ message: `Role updated to ${newRole}`, user });
+
   } catch (error) {
     res.status(500).json({ message: "Error updating role", error });
   }
 };
 
+
 // Verify Alumni
 export const verifyAlumni = async (req, res) => {
   const { uid } = req.body;
   try {
-    const user = await User.findOneAndUpdate(
+    const user = await Alumni.findOneAndUpdate(
       { uid, role: "alumni" },
       { verified: true },
       { new: true }
@@ -119,7 +154,7 @@ export const getAdminProfile = async (req, res) => {
 export const getDashboardCounts = async (req, res) => {
   try {
     const students = await User.countDocuments({ role: "student" });
-    const alumni = await User.countDocuments({ role: "alumni" });
+    const alumni = await Alumni.countDocuments({ role: "alumni" });
     const events = await Event.countDocuments();
    
     res.json({ students, alumni, events });
@@ -133,14 +168,14 @@ export const deleteAlumni = async (req, res) => {
 
   try {
     // Check if alumni exists
-    const alumni = await User.findOne({ uid, role: "alumni" });
+    const alumni = await Alumni.findOne({ uid, role: "alumni" });
 
     if (!alumni) {
       return res.status(404).json({ message: "Alumni not found" });
     }
 
     // Delete from MongoDB
-    await User.deleteOne({ uid });
+    await Alumni.deleteOne({ uid });
 
     // Delete account from Firebase Auth
     await admin.auth().deleteUser(uid);
