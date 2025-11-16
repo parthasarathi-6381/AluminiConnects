@@ -40,10 +40,11 @@ export default function Navbar() {
     <nav className="navbar-white">
       {/* LEFT LINKS */}
       <div className="nav-left">
-        <Link to="/home">Home</Link>
-        <Link to="/events">Events</Link>
-        <Link to="/jobs">Jobs</Link>
-        <Link to="/discussions">Discussion</Link>
+        <NavLink to="/home" className="nav-link">Home</NavLink>
+        <NavLink to="/events" className="nav-link">Events</NavLink>
+        <NavLink to="/messages" className="nav-link">Messages</NavLink>
+        <NavLink to="/jobs" className="nav-link">Jobs</NavLink>
+        <NavLink to="/discussions" className="nav-link">Discussions</NavLink>
       </div>
 
       {/* RIGHT SIDE PROFILE CIRCLE */}

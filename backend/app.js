@@ -11,7 +11,7 @@ import adminRoutes from './routes/admin.routes.js';
 import eventRoutes from './routes/event.routes.js';
 import jobRoutes from './routes/job.routes.js';
 import "./cronJobs/cleanUpEvents.js";
-
+import messageRoutes from "./routes/message.routes.js";
 
 const app = express();
 
@@ -26,7 +26,7 @@ app.use('/api/discussion', discussionRoutes);
 app.use('/api/admin',adminRoutes);
 app.use('/api/events',eventRoutes);
 app.use("/api/jobs", jobRoutes);
-
+app.use("/api/messages", messageRoutes);
 // Base route
 app.get("/", (req, res) => {
   res.send("Alumni Discussion Backend Running...");

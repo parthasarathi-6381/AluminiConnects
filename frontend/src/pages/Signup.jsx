@@ -215,26 +215,30 @@ export default function Signup() {
                 </div>
 
                 {/* DEPARTMENT */}
-                {formData.role !== "admin" && (
-                  <div className="mb-3">
-                    <label className="form-label text-white">Department</label>
-                    <div className="input-group">
-                      <span className="input-group-text bg-dark text-white border-0">
-                        <Building2 size={18} />
-                      </span>
-                      <input
-                        type="text"
-                        className="form-control bg-dark text-white border-0"
-                        placeholder="Enter department"
-                        value={formData.department}
-                        onChange={(e) =>
-                          handleChange("department", e.target.value)
-                        }
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
+               {formData.role !== "admin" && (
+  <div className="mb-3">
+    <label className="form-label text-white">Department</label>
+    <div className="input-group">
+      <span className="input-group-text bg-dark text-white border-0">
+        <Building2 size={18} />
+      </span>
+
+      <select
+        className="form-select bg-dark text-white border-0"
+        value={formData.department}
+        onChange={(e) => handleChange("department", e.target.value)}
+        required
+      >
+        <option value="">Select Department</option>
+        <option value="EEE">EEE</option>
+        <option value="ECE">ECE</option>
+        <option value="MECH">MECH</option>
+        <option value="CSE">CSE</option>
+        <option value="CIVIL">CIVIL</option>
+      </select>
+    </div>
+  </div>
+)}
 
                 {/* GRADUATION YEAR */}
                 {formData.role !== "admin" && (
