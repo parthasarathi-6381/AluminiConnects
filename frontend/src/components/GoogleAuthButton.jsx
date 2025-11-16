@@ -39,7 +39,9 @@ export default function GoogleAuthButton() {
   };
 
   return (
-    <button className="btn btn-danger w-100 mt-3" onClick={handleGoogleLogin}>
+    <button className="btn btn-primary w-100 py-2 fw-bold fs-5" style={{
+  marginTop: "12px"
+}} onClick={handleGoogleLogin}>
       Continue with Google
     </button>
   );

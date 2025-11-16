@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function CompleteProfile() {
+  const [role, setRole] = useState("");                 // NEW FIELD
   const [department, setDepartment] = useState("");
   const [graduationYear, setGraduationYear] = useState("");
   const [error, setError] = useState("");
@@ -27,6 +28,7 @@ export default function CompleteProfile() {
         body: JSON.stringify({
           name,
           email,
+          role,                 // NEW
           department,
           graduationYear,
         }),
@@ -49,7 +51,6 @@ export default function CompleteProfile() {
   return (
     <div className="min-vh-100 d-flex justify-content-center align-items-center position-relative overflow-hidden bg-dark">
 
-      {/* 🔵 Animated gradient blobs */}
       <div className="bg-shape1"></div>
       <div className="bg-shape2"></div>
 
@@ -63,18 +64,51 @@ export default function CompleteProfile() {
 
         <form onSubmit={handleSubmit}>
 
-          {/* Department */}
+          {/* ROLE (NEW FIELD) */}
+          <div className="mb-3">
+            <label className="form-label text-white">Role</label>
+
+           <select
+              className="form-select bg-dark text-white border-0"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+              style={{
+                height: "48px",
+                paddingTop: "10px",
+                paddingBottom: "10px",
+              }}
+            >
+              <option value="">Select Role</option>
+              <option value="student">Student</option>
+              <option value="alumni">Alumni</option>
+            </select>
+
+          </div>
+
+          {/* Department (UPDATED) */}
           <div className="mb-3">
             <label className="form-label text-white">Department</label>
-            <input
-              type="text"
-              className="form-control bg-dark text-white border-0"
-              placeholder="Enter your department"
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              required
-              style={{ height: "42px" }}
-            />
+
+           <select
+            className="form-select bg-dark text-white border-0"
+            value={department}
+            onChange={(e) => setDepartment(e.target.value)}
+            required
+            style={{
+              height: "48px",
+              paddingTop: "10px",
+              paddingBottom: "10px",
+            }}
+          >
+                    <option value="">Select Department</option>
+                    <option value="EEE">EEE</option>
+                    <option value="ECE">ECE</option>
+                    <option value="MECH">MECH</option>
+                    <option value="CSE">CSE</option>
+                    <option value="CIVIL">CIVIL</option>
+            </select>
+
           </div>
 
           {/* Graduation Year */}
@@ -107,7 +141,6 @@ export default function CompleteProfile() {
         </form>
       </div>
 
-      {/* Same CSS as Login Page */}
       <style>{`
         .glass {
           background: rgba(255,255,255,0.1) !important;

@@ -34,7 +34,6 @@ export default function Navbar() {
       <div className="nav-left">
         <NavLink to="/home" className="nav-link">Home</NavLink>
         <NavLink to="/events" className="nav-link">Events</NavLink>
-        <NavLink to="/jobs" className="nav-link">Jobs</NavLink>
         <NavLink to="/messages" className="nav-link">Messages</NavLink>
         <NavLink to="/jobs" className="nav-link">Jobs</NavLink>
         <NavLink to="/discussions" className="nav-link">Discussions</NavLink>
