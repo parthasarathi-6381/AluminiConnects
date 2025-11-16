@@ -1,79 +1,91 @@
-/* src/App.css (Navbar styles) */
+/* ===========================
+   NAVBAR (WHITE TOP BAR)
+   =========================== */
+.navbar-white {
+  width: 100%;
+  height: 65px;
 
-.navbar {
+  background: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
-  background-color: #ffffff;
-  padding: 12px 24px;
 
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 0 40px;
 
-  /* 🔥 KEEP NAVBAR ABOVE EVERYTHING */
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
 
-  height: 60px; /* IMPORTANT */
-  z-index: 2000; /* ABOVE SIDEBAR */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 9999; /* 🔥 ALWAYS ABOVE SIDEBAR */
 }
 
+/* ===========================
+   LEFT NAV LINKS
+   =========================== */
 .nav-left {
   display: flex;
-  gap: 20px;
-}
-
-.nav-link {
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.nav-link:hover {
-  color: #007bff;
-}
-
-.nav-right {
-  display: flex;
   align-items: center;
+  gap: 28px;
 }
 
-.profile-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
+.nav-left a {
+  text-decoration: none;
+  font-weight: 600;
+  color: #2d2d2d;
+  font-size: 15px;
+  transition: 0.25s ease;
 }
 
-.profile-image {
+.nav-left a:hover {
+  color: #6a4df4;
+}
+
+/* ===========================
+   PROFILE CIRCLE (TOP RIGHT)
+   =========================== */
+.nav-profile-circle {
   width: 40px;
   height: 40px;
+
+  background: #6a4df4;
+  color: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 16px;
+  font-weight: 700;
+
   border-radius: 50%;
-  border: 2px solid #007bff;
-  object-fit: cover;
-  transition: transform 0.2s ease;
+  cursor: pointer;
+
+  transition: background 0.3s, transform 0.2s ease-out;
 }
 
-.profile-image:hover {
-  transform: scale(1.05);
+.nav-profile-circle:hover {
+  background: #5637e3;
+  transform: scale(1.06);
 }
 
-.event-description {
-  margin-top: 12px;
+/* ===========================
+   FIX FOR PAGE CONTENT
+   (PREVENT CONTENT HIDING UNDER NAVBAR)
+   =========================== */
+.page-wrapper {
+  padding-top: 75px; /* Matches navbar height for spacing */
 }
 
-.event-description strong {
-  font-size: 15px;
-  color: #222;
-  display: block;
-  margin-bottom: 4px;
-}
+/* ===========================
+   MOBILE RESPONSIVE FIXES
+   =========================== */
+@media (max-width: 600px) {
+  .navbar-white {
+    padding: 0 18px;
+  }
 
-.event-description-text {
-  font-size: 14px;
-  color: #444;
-  line-height: 1.4;
+  .nav-left {
+    gap: 16px;
+  }
 }

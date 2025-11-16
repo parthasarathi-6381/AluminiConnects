@@ -1,9 +1,11 @@
 .jobs-dashboard {
+  margin-top: 60px;
   padding: 24px;
   background: #f9f9f9;
 }
 
 .jobs-dashboard h2 {
+  margin-top: 60px;
   margin-bottom: 20px;
   font-size: 28px;
   color: #111827;

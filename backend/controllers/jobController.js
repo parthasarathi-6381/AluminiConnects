@@ -35,3 +35,16 @@ export const deleteJobs = async (req, res) => {
     res.status(500).json({ message: "Failed to delete job", error: err.message });
   }
 }
+
+export const getDashboardCounts = async (req, res) => {
+  try {
+    const students = await User.countDocuments({ role: "student" });
+    const alumni = await User.countDocuments({ role: "alumni" });
+    const events = await Event.countDocuments();
+    const jobs = await Job.countDocuments(); // <-- add
+
+    res.json({ students, alumni, events, jobs }); // <-- include jobs
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching counts", error });
+  }
+};

@@ -1,0 +1,93 @@
+/* Page Layout (sidebar space = 230px) */
+.manage-jobs-page {
+  margin-left: 230px;
+  margin-top: 100px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #222;
+}
+
+/* Heading */
+.manage-jobs-page h2,
+.manage-jobs-page h4 {
+  font-weight: bold;
+  color: #3b236b;
+  margin-bottom: 15px;
+}
+
+/* Success message */
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+/* Box container like Jobs UI */
+.job-box {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Input + Select fields */
+.manage-jobs-page input,
+.manage-jobs-page select,
+.manage-jobs-page textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background: #fff;
+  margin-top: 5px;
+}
+
+/* Create button */
+.manage-jobs-page button.btn-primary {
+  background: #5a0ecb;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.manage-jobs-page button.btn-primary:hover {
+  background: #430aa0;
+}
+
+/* Jobs list */
+.list-group {
+  margin-top: 20px;
+}
+
+.list-group-item {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px !important;
+  padding: 18px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.list-group-item strong {
+  color: #4b208c;
+}
+
+/* Delete button */
+.btn-danger {
+  background-color: #dc3545;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background-color: #b32a35;
+}

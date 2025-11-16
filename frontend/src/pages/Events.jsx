@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import "./Events.css";
+import { useAuth } from "../components/AuthProvider";
+import "./StudentDashboard.css";
 
 const TEXT_PREVIEW_LENGTH = 100;
 
@@ -12,7 +14,6 @@ function getPlainTextFromHtml(html) {
   return div.textContent || div.innerText || "";
 }
 
-// Determine event status based on date
 function getEventStatus(dateString) {
   const today = new Date();
   const eventDate = new Date(dateString);
@@ -26,6 +27,7 @@ function getEventStatus(dateString) {
 }
 
 export default function Events() {
+  const { profile } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
@@ -36,24 +38,35 @@ export default function Events() {
         const res = await api.get("/api/events/");
         setEvents(res.data.events || []);
       } catch (err) {
-        console.error("Error fetching events:", err);
-        setErrorMsg(err.response?.data?.message || "Failed to load events");
+        setErrorMsg("Failed to load events");
       } finally {
         setLoading(false);
       }
     };
+
     fetchEvents();
   }, []);
 
-  async function deleteEvent(id) {
+  // 🔥 DELETE EVENT (Admin + ClubMember only)
+  async function deleteEvent(eventId) {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
 
     try {
-      await api.delete(`/api/events/${id}`);
-      setEvents(prev => prev.filter(ev => ev._id !== id));
+      await api.delete(`/api/events/${eventId}`);
+      setEvents((prev) => prev.filter((ev) => ev._id !== eventId));
     } catch (err) {
-      console.error("DELETE ERROR:", err);
-      alert(err.response?.data?.message || "Failed to delete event");
+      alert("Failed to delete event");
+    }
+  }
+
+  // 🔥 APPLY FOR EVENT (Student + Alumni)
+  async function handleRegister(eventId) {
+    try {
+      await api.post(`/api/events/${eventId}/register`);
+
+      alert("Successfully registered for the event!");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to register for event");
     }
   }
 
@@ -69,19 +82,14 @@ export default function Events() {
           const plain = getPlainTextFromHtml(ev.description);
           const preview =
             plain.length > TEXT_PREVIEW_LENGTH
-              ? plain.slice(0, TEXT_PREVIEW_LENGTH).trim() + "..."
+              ? plain.slice(0, TEXT_PREVIEW_LENGTH) + "..."
               : plain;
 
-          const formattedDate = ev.date
-            ? new Date(ev.date)
-                .toISOString()
-                .split("T")[0]
-                .split("-")
-                .reverse()
-                .join("-")
-            : "-";
-
           const status = getEventStatus(ev.date);
+
+          const formattedDate = ev.date
+            ? new Date(ev.date).toISOString().split("T")[0].split("-").reverse().join("-")
+            : "-";
 
           return (
             <div key={ev._id} className="event-card">
@@ -93,25 +101,33 @@ export default function Events() {
               </div>
 
               <p className="event-date">{formattedDate}</p>
-
-              <p className="event-meta">
-                <strong>Venue:</strong> {ev.venue}
-              </p>
-              <p className="event-meta">
-                <strong>Capacity:</strong> {ev.capacity}
-              </p>
+              <p className="event-meta"><strong>Venue:</strong> {ev.venue}</p>
+              <p className="event-meta"><strong>Capacity:</strong> {ev.capacity}</p>
 
               <div className="event-description">
                 <strong>Description:</strong>
                 <div className="event-description-text">{preview}</div>
               </div>
 
-              <button
-                className="delete-btn"
-                onClick={() => deleteEvent(ev._id)}
-              >
-                🗑
-              </button>
+              {/* 🔥 ADMIN + CLUB MEMBER delete */}
+              {(profile?.role === "admin" ) && (
+                <button
+                  className="delete-btn"
+                  onClick={() => deleteEvent(ev._id)}
+                >
+                  🗑 Delete
+                </button>
+              )}
+
+              {/* 🔥 STUDENT + ALUMNI apply */}
+              {(profile?.role === "student" || profile?.role === "alumni" || profile?.role==="clubMember") && (
+                <button
+                  className="apply-btn"
+                  onClick={() => handleRegister(ev._id)}
+                >
+                  Apply
+                </button>
+              )}
             </div>
           );
         })}
