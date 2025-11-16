@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
@@ -25,30 +26,44 @@ import EventsDashboard from "./pages/Events";
 import AlumniDashboard from "./pages/AlumniDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import CompleteProfile from "./pages/CompleteProfile";
+import AdminJobs from "./pages/AdminJobs";
 
 export default function App() {
-  const { profile } = useAuth();
+  const { profile, currentUser } = useAuth();
   const location = useLocation();
 
+  // Paths where navbar should NOT appear
   const hideNavbarPaths = ["/login", "/signup", "/forgot-password"];
+
+  // Navbar shows only when user is logged in + not on auth pages
   const shouldShowNavbar =
-    profile && !hideNavbarPaths.includes(location.pathname);
+    currentUser && !hideNavbarPaths.includes(location.pathname);
 
   return (
     <>
       {shouldShowNavbar && <Navbar />}
 
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Default route */}
+        <Route path="/" element={<Navigate to="/home" replace />} />
 
+        {/* Auth routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-
         <Route path="/complete-profile" element={<CompleteProfile />} />
 
+        {/* Protected Home */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute role={["student", "alumni", "clubMember", "admin"]}>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Public pages */}
-        <Route path="/home" element={<Home />} />
         <Route path="/events" element={<Events />} />
         <Route path="/donations" element={<Donations />} />
         <Route path="/jobs" element={<Jobs />} />
@@ -65,6 +80,7 @@ export default function App() {
         >
           <Route index element={<AdminDashboardHome />} />
           <Route path="create-event" element={<CreateEvent />} />
+          <Route path="jobs" element={<AdminJobs />} />
           <Route path="students" element={<ManageStudents />} />
           <Route path="alumni" element={<ManageAlumni />} />
           <Route path="events" element={<EventsDashboard />} />
@@ -80,11 +96,11 @@ export default function App() {
           }
         />
 
-        {/* Students */}
+        {/* Students + Club Members */}
         <Route
           path="/student"
           element={
-            <ProtectedRoute role="student">
+            <ProtectedRoute role={["student", "clubMember"]}>
               <StudentDashboard />
             </ProtectedRoute>
           }

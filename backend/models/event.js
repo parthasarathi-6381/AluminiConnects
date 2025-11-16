@@ -11,11 +11,10 @@ const eventSchema = new mongoose.Schema({
     enum: ["upcoming", "completed", "cancelled"],
     default: "upcoming"
   },
- /* createdBy: {
-    uid: { type: String, required: true }, // Firebase UID of club member/admin
-    name: { type: String .required: true},
+  createdBy: {
+    uid: { type: String, required: true }, 
     role: { type: String, enum: ["clubMember", "admin"], required: true }
-  },*/
+  },
   //tags: { type: [String], default: [] },
  
 }, { timestamps: true });

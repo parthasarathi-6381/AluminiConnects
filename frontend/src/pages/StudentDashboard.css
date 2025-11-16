@@ -1,0 +1,209 @@
+/* FIX: Prevent sidebar from overlapping navbar */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  margin-top: 1000px; /* navbar height */
+  background: linear-gradient(135deg, #0d0f23, #1a1f3c, #2c0f49);
+  color: white;
+  padding: 20px;
+  gap: 20px;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+
+  /* glass background */
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+
+  padding: 20px;
+
+  /* FIXED UNDER NAVBAR */
+  position: sticky;
+  top: 60px;          /* navbar height */
+
+  height: calc(100vh - 60px);
+  overflow-y: auto;    /* scroll only the content */
+}
+
+
+/* PROFILE CARD */
+.profile-header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.profile-avatar {
+  width: 70px;
+  height: 70px;
+  background: #6a5acd;
+  color: white;
+  font-size: 26px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  margin: 0 auto 10px auto;
+  font-weight: bold;
+}
+
+.profile-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.profile-title {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* SIDEBAR BUTTONS */
+.sidebar button,
+.btn {
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 10px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.btn-outline-light {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  background: transparent;
+}
+
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary {
+  background: #6a5acd;
+  border: none;
+  color: white;
+}
+
+.btn-danger {
+  background: #c82333;
+  border: none;
+  color: white;
+}
+
+/* MAIN CONTENT */
+.content {
+  flex-grow: 1;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px);
+  border-radius: 14px;
+  padding: 25px;
+  overflow-y: auto;
+  height: calc(100vh - 90px); /* align with sidebar */
+}
+
+/* HEADER */
+.section-title {
+  margin-bottom: 20px;
+}
+
+.section-title h2 {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.muted {
+  opacity: 0.8;
+  margin-top: -4px;
+}
+
+/* CARDS */
+.card {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* INPUT FIELDS */
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  margin-top: 5px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* FORM LABELS */
+label {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* My Events list */
+.event-item {
+  background: rgba(0, 0, 0, 0.45);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Event title */
+.event-item h4 {
+  color: #b388ff;
+  margin-bottom: 8px;
+}
+
+/* Buttons inside event box */
+.event-item .btn-sm {
+  width: auto;
+  padding: 5px 12px;
+  font-size: 13px;
+}
+
+/* REGISTRATIONS TABLE */
+.reg-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.reg-table th,
+.reg-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.reg-table th {
+  text-align: left;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.reg-empty {
+  text-align: center;
+  padding: 20px;
+  color: #bbb;
+}
+
+/* SCROLL FIX */
+.sidebar::-webkit-scrollbar,
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+}

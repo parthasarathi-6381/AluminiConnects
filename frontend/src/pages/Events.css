@@ -123,6 +123,22 @@
   height: 100%;
 }
 
+.apply-btn {
+  margin-top: 10px;
+  background: #5a0ecb;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.apply-btn:hover {
+  background: #430ba0;
+}
+
+
 .event-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 10px 24px rgba(16,24,40,0.12);

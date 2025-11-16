@@ -13,16 +13,13 @@ import upload from "../middleware/upload.js";
 // @private route
 
 export const createEvent = async (req, res) => {
-  
   try {
-    
     const { title, description, date, venue, capacity } = req.body;
     const { uid, role } = req.user;
-  //  const users = await User.find({ uid })
-    if (role !== "admin" && role !== "clubMember")
-      return res.status(403).json({ message: "Only club members or admins can create events" });
 
-    //const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    if (role !== "admin" && role !== "clubMember") {
+      return res.status(403).json({ message: "Only admins & club members can create events" });
+    }
 
     const event = await Event.create({
       title,
@@ -30,9 +27,10 @@ export const createEvent = async (req, res) => {
       date,
       venue,
       capacity,
-     // tags: tags ? JSON.parse(tags) : [],
-      
-     // createdBy: { uid, name: users.name, role }
+      createdBy: {
+        uid,
+        role
+      }
     });
 
     res.status(201).json({ message: "Event created successfully", event });
@@ -41,6 +39,7 @@ export const createEvent = async (req, res) => {
     res.status(500).json({ message: "Error creating event", error });
   }
 };
+
 
 //  Edit Event (only creator/admin)
 // @private route
@@ -72,8 +71,9 @@ export const deleteEvent = async (req, res) => {
     const event = await Event.findById(eventId);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
-    if (role !== "admin" && event.createdBy.uid !== uid)
+    if (role !== "admin" && event.createdBy.uid !== uid) {
       return res.status(403).json({ message: "Not authorized to delete this event" });
+    }
 
     await event.deleteOne();
     res.json({ message: "Event deleted successfully" });
@@ -81,6 +81,7 @@ export const deleteEvent = async (req, res) => {
     res.status(500).json({ message: "Error deleting event", error });
   }
 };
+
 
 //  View Registrations (creator/admin)
 // @private route
@@ -92,19 +93,23 @@ export const viewRegistrations = async (req, res) => {
     const event = await Event.findById(eventId);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
-    if (role !== "admin" && event.createdBy.uid !== uid)
+    if (role !== "admin" && event.createdBy.uid !== uid) {
       return res.status(403).json({ message: "Not authorized to view registrations" });
+    }
 
-   res.json({
+    const registrations = await Registration.find({ eventId }).sort({ registeredAt: -1 });
+
+    res.json({
       eventTitle: event.title,
       date: event.date,
-      totalRegistrations: event.registrations.length,
-      registrations: event.registrations,
+      totalRegistrations: registrations.length,
+      registrations
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching registrations", error });
   }
 };
+
 
 //  Auto-cleanup past events (run daily via cron or manually)
 export const autoCleanupEvents = async (req, res) => {
@@ -237,7 +242,7 @@ export const registerForEvent = async (req, res) => {
     const { uid, email, role } = req.user;
     const user = await User.findOne({ uid });
     // Only students and alumni can register
-    if (role !== "student" && role !== "alumni")
+    if (role==="admin")
       return res.status(403).json({ message: "Only students or alumni can register" });
 
     const event = await Event.findById(eventId);
@@ -291,9 +296,9 @@ export const getAllEvents = async (req, res) => {
       return res.status(404).json({ message: "No events found" });
     }
 
-    const formattedEvents = events.map((event) => {
-    console.log("BACKEND EVENT DATE:", event.date);  // <--- HERE
-
+    const formattedEvents = await Promise.all(
+  events.map(async (event) => {
+    const count = await Registration.countDocuments({ eventId: event._id });
     return {
       _id: event._id,
       title: event.title,
@@ -302,8 +307,11 @@ export const getAllEvents = async (req, res) => {
       status: event.status,
       date: event.date,
       capacity: event.capacity,
+      registeredCount: count
     };
-  }) || [];
+  })
+);
+
 
 
     res.json({
@@ -335,3 +343,18 @@ export const getUpcomingEvents = async (req, res) => {
     res.status(500).json({ message: "Error fetching upcoming events", error });
   }
 };
+
+export const getMyEvents = async (req, res) => {
+  try {
+    const { uid } = req.user;
+
+    const events = await Event.find({ "createdBy.uid": uid })
+      .select("title date venue createdBy");  // <-- IMPORTANT
+
+    res.json(events);
+  } catch (error) {
+    console.error("Error loading my events:", error);
+    res.status(500).json({ message: "Error loading my events" });
+  }
+};
+

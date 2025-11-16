@@ -1,56 +1,58 @@
-// src/components/Navbar.jsx
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "./AuthProvider";
 import "./Navbar.css";
+import { useAuth } from "./AuthProvider";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const { profile } = useAuth();
   const navigate = useNavigate();
 
-  const handleProfileClick = () => {
-    if (!profile || !profile.role) {
-      navigate("/login");
-      return;
-    }
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
 
-    switch (profile.role.toLowerCase()) {
-      case "student":
-        navigate("/student");
-        break;
+  // Navigate based on role
+  const goToDashboard = () => {
+    if (!profile) return;
+
+    switch (profile.role) {
       case "admin":
         navigate("/admin");
         break;
       case "alumni":
         navigate("/alumni");
         break;
+      case "student":
+      case "clubMember":
+        navigate("/student");
+        break;
       default:
-        navigate("/login");
+        navigate("/home");
     }
   };
 
   return (
-    <nav className="navbar ">
+    <nav className="navbar-white">
+      {/* LEFT LINKS */}
       <div className="nav-left">
-        <NavLink to="/home" className="nav-link">Home</NavLink>
-        <NavLink to="/events" className="nav-link">Events</NavLink>
-        <NavLink to="/jobs" className="nav-link">Jobs</NavLink>
-        <NavLink to="/donations" className="nav-link">Donations</NavLink>
-        <NavLink to="/jobs" className="nav-link">Jobs</NavLink>
-        <NavLink to="/discussions" className="nav-link">Discussions</NavLink>
+        <Link to="/home">Home</Link>
+        <Link to="/events">Events</Link>
+        <Link to="/jobs">Jobs</Link>
+        <Link to="/discussions">Discussion</Link>
       </div>
 
+      {/* RIGHT SIDE PROFILE CIRCLE */}
       <div className="nav-right">
-        <button onClick={handleProfileClick} className="profile-btn">
-          <img
-            src={
-              profile?.photoURL ||
-              "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-            }
-            alt="Profile"
-            className="profile-image"
-          />
-        </button>
+
+        {/* Profile Circle Clickable */}
+        <div className="nav-profile-circle" onClick={goToDashboard}>
+          {getInitials(profile?.name)}
+        </div>
       </div>
     </nav>
   );

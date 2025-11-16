@@ -12,11 +12,12 @@ import {
   getUpcomingEvents,
   getEventRegistrations,
   exportEventRegistrationsExcel,
+  getMyEvents
 } from "../controllers/eventController.js";
 
 const router = express.Router();
 
-// Protected routes: create/edit/delete require auth + role
+// CREATE event
 router.post(
   "/create",
   verifyFirebaseToken,
@@ -25,6 +26,7 @@ router.post(
   createEvent
 );
 
+// EDIT event
 router.put(
   "/:eventId/edit",
   verifyFirebaseToken,
@@ -33,7 +35,7 @@ router.put(
   editEvent
 );
 
-// Use DELETE method
+// DELETE event
 router.delete(
   "/:eventId",
   verifyFirebaseToken,
@@ -41,27 +43,35 @@ router.delete(
   deleteEvent
 );
 
-// Public or protected depending on your design
-router.get("/", verifyFirebaseToken ,getAllEvents);
+// 🔥 PUBLIC — get all events
+router.get("/", getAllEvents);
 
-// Upcoming events (maybe public) – if you want protected, add verify
+// UPCOMING events (protected)
 router.get("/upcoming", verifyFirebaseToken, getUpcomingEvents);
 
-// Registration route
+// REGISTER for event
 router.post(
   "/:eventId/register",
   verifyFirebaseToken,
   registerForEvent
 );
 
-// View registrations – admin or creator only
+// CLUBMEMBER / ADMIN — see only own events
+router.get(
+  "/my-events",
+  verifyFirebaseToken,
+  isClubMemberOrAdmin,
+  getMyEvents
+);
+
+// VIEW registrations (creator OR admin)
 router.get(
   "/:eventId/registrations",
   verifyFirebaseToken,
   getEventRegistrations
 );
 
-// Export registrations Excel
+// EXPORT registrations
 router.get(
   "/:eventId/registrations/export",
   verifyFirebaseToken,
