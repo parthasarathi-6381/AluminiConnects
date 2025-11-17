@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { auth } from "../firebase";
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function CompleteProfile() {
@@ -12,41 +12,52 @@ export default function CompleteProfile() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  setError("");
 
-    const token = localStorage.getItem("tempToken");
-    const email = localStorage.getItem("tempEmail");
-    const name = localStorage.getItem("tempName");
+  try {
+    const user = auth.currentUser;
 
-    try {
-      const res = await fetch(`${API_BASE}/api/users/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          role,                 // NEW
-          department,
-          graduationYear,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Failed to save profile");
-
-      localStorage.removeItem("tempUid");
-      localStorage.removeItem("tempToken");
-      localStorage.removeItem("tempEmail");
-      localStorage.removeItem("tempName");
-
-      alert("Profile completed! You can now access the dashboard.");
-      navigate("/home");
-    } catch (err) {
-      setError(err.message);
+    if (!user) {
+      throw new Error("User not logged in.");
     }
-  };
+
+    const token = await user.getIdToken();
+
+    // 1️⃣ Send details to backend
+    const res = await fetch(`${API_BASE}/api/users/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+        name: localStorage.getItem("tempName"),
+        department,
+        graduationYear,
+      }),
+    });
+
+    if (!res.ok) throw new Error("Failed to save profile");
+
+    // 2️⃣ ⭐ IMPORTANT FIX: Force Firebase to refresh token
+    await user.getIdToken(true);   // 🔥 FIX THAT PREVENTS LOGOUT
+
+    // Alternatively you can do:
+    // import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+    // const credential = GoogleAuthProvider.credential(user.stsTokenManager.accessToken);
+    // await signInWithCredential(auth, credential);
+
+    // 3️⃣ Redirect AFTER the token refresh
+    navigate("/home");
+    return;
+  } catch (err) {
+    console.error(err);
+    setError(err.message);
+  }
+};
 
   return (
     <div className="min-vh-100 d-flex justify-content-center align-items-center position-relative overflow-hidden bg-dark">

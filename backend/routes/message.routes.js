@@ -1,18 +1,19 @@
 import express from "express";
 import verifyFirebaseToken from "../middleware/verifyFirebaseToken.js";
 import {
-  searchAlumni,
+ 
   getOrCreateConversation,
   getMyConversations,
   getMessages,
   sendMessageHttp,
+  searchUsers
 } from "../controllers/messageController.js";
 
 const router = express.Router();
 
 // search alumni by name
-router.get("/search-alumni", verifyFirebaseToken, searchAlumni);
-
+//router.get("/search-alumni", verifyFirebaseToken, searchAlumni);
+router.get("/search-users", verifyFirebaseToken, searchUsers);
 // get or create a conversation between two users
 router.post("/conversation", verifyFirebaseToken, getOrCreateConversation);
 

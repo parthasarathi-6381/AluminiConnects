@@ -184,9 +184,14 @@ export default function Messages() {
 
     setSearchLoading(true);
     try {
+      /*const searchUrl =
+               currentUser?.role === "alumni"
+               ? "/api/messages/search-students"
+               : "/api/messages/search-alumni";*/
+
       const token = await currentUser.getIdToken();
       const res = await fetch(
-        `${API_BASE}/api/messages/search-alumni?q=${encodeURIComponent(
+        `${API_BASE}/api/messages/search-users?q=${encodeURIComponent(
           searchQuery
         )}`,
         {
