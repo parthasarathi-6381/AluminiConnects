@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import api from "../utils/api";
 import ReactQuill from "react-quill";
 import DatePicker from "react-datepicker";
+import { useAuth } from "../components/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 import "react-quill/dist/quill.snow.css";
 import "react-datepicker/dist/react-datepicker.css";
@@ -16,7 +18,8 @@ export default function CreateEvent() {
   const [eventDate, setEventDate] = useState(new Date());
   const [eventTime, setEventTime] = useState(new Date());
 
-  
+  const { profile } = useAuth();
+  const navigate = useNavigate();
 
   const submitEvent = async (e) => {
     e.preventDefault();
@@ -25,7 +28,9 @@ export default function CreateEvent() {
     form.append("title", title);
     form.append("description", description);
     form.append("venue", venue);
+
     if (capacity) form.append("capacity", capacity);
+
     form.append("date", eventDate.toISOString());
     form.append("time", eventTime.toISOString());
 
@@ -33,8 +38,16 @@ export default function CreateEvent() {
       const res = await api.post("/api/events/create", form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       alert(res.data.message || "Event Created Successfully!");
-      // optionally reset form or navigate
+
+      // Reset form
+      setTitle("");
+      setDescription("");
+      setVenue("");
+      setCapacity("");
+      setEventDate(new Date());
+      setEventTime(new Date());
     } catch (err) {
       console.error("Error creating event:", err);
       alert("Failed to create event: " + (err.response?.data?.message || err.message));
@@ -44,6 +57,9 @@ export default function CreateEvent() {
   return (
     <div className="create-container">
       <h2>Create Event</h2>
+
+      {/* 🔥 Admin Only — View Event Registrations */}
+      
 
       <form className="create-form" onSubmit={submitEvent}>
         <label>Event Title</label>
@@ -76,14 +92,15 @@ export default function CreateEvent() {
           type="number"
           value={capacity}
           onChange={(e) => setCapacity(e.target.value)}
-          placeholder="Enter capacity"
+          placeholder="Enter capacity (optional)"
         />
 
-       
-        
-
         <label>Event Date</label>
-        <DatePicker selected={eventDate} onChange={setEventDate} />
+        <DatePicker
+          selected={eventDate}
+          onChange={setEventDate}
+          className="date-picker"
+        />
 
         <label>Event Time</label>
         <DatePicker
@@ -94,6 +111,7 @@ export default function CreateEvent() {
           timeIntervals={15}
           timeCaption="Time"
           dateFormat="h:mm aa"
+          className="date-picker"
         />
 
         <button type="submit" className="submit-btn">

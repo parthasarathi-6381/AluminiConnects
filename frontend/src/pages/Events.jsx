@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import "./Events.css";
 import { useAuth } from "../components/AuthProvider";
+import { useNavigate } from "react-router-dom";
 import "./StudentDashboard.css";
 
 const TEXT_PREVIEW_LENGTH = 100;
@@ -17,7 +18,6 @@ function getPlainTextFromHtml(html) {
 function getEventStatus(dateString) {
   const today = new Date();
   const eventDate = new Date(dateString);
-
   today.setHours(0, 0, 0, 0);
   eventDate.setHours(0, 0, 0, 0);
 
@@ -28,6 +28,7 @@ function getEventStatus(dateString) {
 
 export default function Events() {
   const { profile } = useAuth();
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
@@ -43,30 +44,25 @@ export default function Events() {
         setLoading(false);
       }
     };
-
     fetchEvents();
   }, []);
 
-  // 🔥 DELETE EVENT (Admin + ClubMember only)
   async function deleteEvent(eventId) {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
-
     try {
       await api.delete(`/api/events/${eventId}`);
       setEvents((prev) => prev.filter((ev) => ev._id !== eventId));
-    } catch (err) {
+    } catch {
       alert("Failed to delete event");
     }
   }
 
-  // 🔥 APPLY FOR EVENT (Student + Alumni)
   async function handleRegister(eventId) {
     try {
       await api.post(`/api/events/${eventId}/register`);
-
-      alert("Successfully registered for the event!");
+      alert("Successfully registered!");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to register for event");
+      alert(err.response?.data?.message || "Failed to register");
     }
   }
 
@@ -94,7 +90,7 @@ export default function Events() {
           return (
             <div key={ev._id} className="event-card">
               <div className="event-card-head">
-                <h3 className="event-title">{ev.title}</h3>
+                <h3>{ev.title}</h3>
                 <span className={`status-badge ${status}`}>
                   {status.toUpperCase()}
                 </span>
@@ -109,22 +105,28 @@ export default function Events() {
                 <div className="event-description-text">{preview}</div>
               </div>
 
-              {/* 🔥 ADMIN + CLUB MEMBER delete */}
-              {(profile?.role === "admin" ) && (
+              {/* Admin: View registrations */}
+              {profile?.role === "admin" && (
                 <button
-                  className="delete-btn"
-                  onClick={() => deleteEvent(ev._id)}
+                  className="view-btn"
+                  onClick={() => navigate(`/admin/event/${ev._id}/registrations`)}
                 >
+                  📋 View Registrations
+                </button>
+              )}
+
+              {/* Admin: Delete */}
+              {profile?.role === "admin" && (
+                <button className="delete-btn" onClick={() => deleteEvent(ev._id)}>
                   🗑 Delete
                 </button>
               )}
 
-              {/* 🔥 STUDENT + ALUMNI apply */}
-              {(profile?.role === "student" || profile?.role === "alumni" || profile?.role==="clubMember") && (
-                <button
-                  className="apply-btn"
-                  onClick={() => handleRegister(ev._id)}
-                >
+              {/* Students + Alumni + club members => apply */}
+              {(profile?.role === "student" ||
+                profile?.role === "alumni" ||
+                profile?.role === "clubMember") && (
+                <button className="apply-btn" onClick={() => handleRegister(ev._id)}>
                   Apply
                 </button>
               )}

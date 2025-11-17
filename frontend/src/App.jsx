@@ -29,6 +29,7 @@ import CompleteProfile from "./pages/CompleteProfile";
 import AdminJobs from "./pages/AdminJobs";
 
 import Messages from "./pages/Messages.jsx";
+import AdminEventRegistrations from "./pages/AdminEventRegistrations.jsx";
 // import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 export default function App() {
@@ -83,6 +84,7 @@ export default function App() {
         >
           <Route index element={<AdminDashboardHome />} />
           <Route path="create-event" element={<CreateEvent />} />
+          <Route path="event/:eventId/registrations" element={<AdminEventRegistrations />} />
           <Route path="jobs" element={<AdminJobs />} />
           <Route path="students" element={<ManageStudents />} />
           <Route path="alumni" element={<ManageAlumni />} />

@@ -1,3 +1,4 @@
+// src/pages/ManageStudents.jsx
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import "./ManageStudents.css";
@@ -5,49 +6,61 @@ import "./ManageStudents.css";
 export default function ManageStudents() {
   const [users, setUsers] = useState([]);
   const [query, setQuery] = useState("");
-  const [view, setView] = useState("students"); // "students" | "clubMembers"
+  const [view, setView] = useState("students");
 
+  // LOAD STUDENTS
   async function loadStudents() {
     const res = await api.get("/api/admin/users/filter/student");
     setUsers(res.data);
     setView("students");
   }
 
+  // LOAD CLUB MEMBERS
   async function loadClubMembers() {
-    const res = await api.get("/api/admin/users/filter/clubMember");
+    const res = await api.get("/api/admin/users/filter/clubmember");
     setUsers(res.data);
     setView("clubMembers");
   }
 
+  // SEARCH
   async function search() {
+    if (!query.trim()) {
+      view === "students" ? loadStudents() : loadClubMembers();
+      return;
+    }
+
     const res = await api.get(`/api/admin/users/search?q=${query}`);
-    const filtered = res.data.filter(u =>
+
+    const filtered = res.data.filter((u) =>
       view === "students"
         ? u.role === "student"
         : u.role === "clubMember"
     );
+
     setUsers(filtered);
   }
 
+  // PROMOTE TO CLUB MEMBER
   async function promote(uid) {
     await api.put("/api/admin/users/role", { uid, newRole: "clubMember" });
-    loadStudents(); // refresh student list
+    loadStudents();
   }
 
+  // DEMOTE TO STUDENT
   async function demote(uid) {
     await api.put("/api/admin/users/role", { uid, newRole: "student" });
-    loadClubMembers(); // refresh clubMember list
+    loadClubMembers();
   }
 
   useEffect(() => {
-    loadStudents(); // default view
+    loadStudents(); // default tab
   }, []);
 
   return (
     <div className="manage-students-page">
       <h2>Manage Students & Club Members</h2>
 
-      {/* Toggle buttons */}
+      {/* TOGGLE BUTTONS */}
       <div className="toggle-buttons">
         <button
           className={view === "students" ? "active" : ""}
@@ -64,16 +77,22 @@ export default function ManageStudents() {
         </button>
       </div>
 
-      {/* Search */}
-      <input
-        placeholder={`Search ${view === "students" ? "students" : "club members"}...`}
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
+      {/* SEARCH BOX */}
+      <div className="search-row">
+        <input
+          placeholder={
+            view === "students"
+              ? "Search students..."
+              : "Search club members..."
+          }
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
 
-      <button onClick={search}>Search</button>
+        <button onClick={search}>Search</button>
+      </div>
 
-      {/* Table */}
+      {/* USERS TABLE */}
       <table className="users-table">
         <thead>
           <tr>

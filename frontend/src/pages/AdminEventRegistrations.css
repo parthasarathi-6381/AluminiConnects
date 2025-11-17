@@ -1,0 +1,114 @@
+/* MAIN WRAPPER – respects navbar (60px) + sidebar (230px) */
+.admin-reg-container {
+  margin-left: 230px;        /* sidebar width */
+  margin-top: 60px;          /* navbar height */
+  padding: 24px;
+  min-height: calc(100vh - 60px);
+  background: linear-gradient(135deg, #0d0f23, #1a1f3c, #2c0f49);
+  color: #f5f5f5;
+  box-sizing: border-box;
+}
+
+/* TITLE + META */
+.admin-reg-container h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.admin-reg-container p {
+  margin: 0 0 18px 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* EXPORT BUTTON */
+.export-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #00c853, #00e676);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 18px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
+}
+
+.export-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  opacity: 0.95;
+}
+
+/* REGISTRATIONS TABLE */
+.reg-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+}
+
+.reg-table thead {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reg-table th,
+.reg-table td {
+  padding: 12px 14px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.reg-table th {
+  font-weight: 600;
+  color: #e6e6ff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.reg-table td {
+  color: #f0f0ff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.reg-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.reg-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* PAGINATION */
+.pagination {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+}
+
+.pagination button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(90, 110, 255, 0.95);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+
+.pagination button:hover {
+  background: rgba(120, 140, 255, 1);
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.pagination button:disabled {
+  background: rgba(120, 120, 160, 0.7);
+  cursor: not-allowed;
+  transform: none;
+}

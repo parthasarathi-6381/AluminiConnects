@@ -14,37 +14,33 @@ import {
   deleteAlumni
 } from "../controllers/adminController.js";
 
-// ✅ Declare router FIRST
 const router = express.Router();
 
-// ✅ Protect all admin routes
+// protect all admin routes
 router.use(verifyFirebaseToken, authorizeRoles("admin"));
 
-// -------------------------------
-// Admin Dashboard API Routes
-// -------------------------------
-
-// Admin profile
+// ADMIN PROFILE
 router.get("/profile", getAdminProfile);
 
-// Dashboard counts
+// DASHBOARD COUNTS
 router.get("/counts", getDashboardCounts);
 
-// Get all users
-router.get("/users", getAllUsers);
-
-// Search users
+// 🔥 FIX — SEARCH ROUTE MUST COME FIRST
 router.get("/users/search", searchUsers);
 
-// Filter users
+// 🔥 FIX — THEN FILTER ROUTE
 router.get("/users/filter/:role", filterByRole);
 
-// Update role
+// GET ALL USERS
+router.get("/users", getAllUsers);
+
+// UPDATE USER ROLE
 router.put("/users/role", updateUserRole);
 
-// Verify alumni
+// VERIFY ALUMNI
 router.put("/users/verify", verifyAlumni);
 
+// DELETE ALUMNI
 router.delete("/users/:uid", deleteAlumni);
 
 export default router;
