@@ -1,73 +1,165 @@
+/* ---------- Page Wrapper ---------- */
 .manage-alumni-page {
-  margin-left: 230px;
-  padding: 25px;
-  font-family: Arial, sans-serif;
+  margin-left: 230px; /* sidebar */
+  padding: 30px;
+  font-family: 'Arial', sans-serif;
+  min-height: calc(100vh - 600px); /* space below top header */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center horizontally */
+  box-sizing: border-box;
+  background-color: #121212; /* dark background */
+  color: #e0e0e0; /* light text */
 }
 
+/* ---------- Heading ---------- */
 .manage-alumni-page h2 {
-  font-size: 24px;
+  text-align: center;
+  width: 90%;
   margin-bottom: 20px;
+  color: #c8a6ff;
 }
 
-.users-table {
-  width: 100%;
+/* ---------- Users Table ---------- */
+.alumni-table {
+  width: 90%;
+  display: table !important;
   border-collapse: collapse;
+  table-layout: fixed;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #333333;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0 auto;
 }
 
-.users-table th {
-  background-color: #f4f4f4;
-  padding: 10px;
+.alumni-table tr {
+  display: table-row !important;
+  transition: background-color 0.2s ease;
+}
+
+.alumni-table tr:hover {
+  background-color: #252525;
+}
+
+.alumni-table th,
+.alumni-table td {
+  display: table-cell !important;
+  padding: 16px;
   text-align: left;
-  font-weight: bold;
-  border-bottom: 2px solid #ddd;
+  vertical-align: middle;
+  word-wrap: break-word;
 }
 
-.users-table td {
-  padding: 10px;
-  border-bottom: 1px solid #e6e6e6;
+.alumni-table th {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+  color: #ffffff;
+  border-bottom: 2px solid #c8a6ff;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-/* Verified tick */
-.verified {
-  color: #28a745;
-  font-size: 20px;
-  font-weight: bold;
+/* Column widths */
+.alumni-table th:nth-child(1),
+.alumni-table td:nth-child(1) { width: 25%; }
+.alumni-table th:nth-child(2),
+.alumni-table td:nth-child(2) { width: 30%; }
+.alumni-table th:nth-child(3),
+.alumni-table td:nth-child(3) { width: 20%; }
+.alumni-table th:nth-child(4),
+.alumni-table td:nth-child(4) { width: 25%; }
+
+/* Center action buttons */
+.alumni-table td:last-child {
+  text-align: center;
 }
 
-/* Unverified X */
+/* ---------- Verified / Unverified ---------- */
+.verified-column {
+  text-align: center;
+}
+
+.verified, 
 .not-verified {
-  color: #dc3545;
   font-size: 20px;
   font-weight: bold;
+  display: inline-block;
 }
 
-/* Verify Button */
+.verified { color: #28a745; }
+.not-verified { color: #dc3545; }
+
+/* ---------- Action Buttons ---------- */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
 .verify-btn {
-  background-color: #28a745;
+  background: linear-gradient(135deg, #28a745 0%, #20873a 100%);
   color: white;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  margin-right: 10px;
   font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
 }
 
 .verify-btn:hover {
-  background-color: #1e7e34;
+  background: linear-gradient(135deg, #20873a 0%, #1e7e34 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
 }
 
-/* Delete Button */
+.verify-btn:active {
+  transform: translateY(0);
+}
+
 .delete-btn {
-  background-color: #dc3545;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
   color: white;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
 }
 
 .delete-btn:hover {
-  background-color: #b52a38;
+  background: linear-gradient(135deg, #c82333 0%, #b52a38 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.delete-btn:active {
+  transform: translateY(0);
+}
+
+/* ---------- Scrollbar for table if needed ---------- */
+.alumni-table tbody {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  .manage-alumni-page { margin-left: 0; padding: 20px; }
+  .alumni-table { width: 100%; }
+  .alumni-table th,
+  .alumni-table td { padding: 12px 8px; font-size: 12px; }
+  .verify-btn,
+  .delete-btn { padding: 6px 12px; font-size: 12px; }
+  .verified-column { text-align: center; }
 }

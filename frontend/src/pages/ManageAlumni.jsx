@@ -29,20 +29,20 @@ export default function ManageAlumni() {
   return (
     <div className="manage-alumni-page">
       <h2>Verify Alumni</h2>
-
-      <table className="users-table">
+      <table className="alumni-table">
         <thead>
           <tr>
-            <th>Name</th><th>Email</th><th>Verified</th><th>Action</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Verified</th>
+            <th>Action</th>
           </tr>
         </thead>
-
         <tbody>
           {alumni.map((a) => (
             <tr key={a.uid}>
               <td>{a.name}</td>
               <td>{a.email}</td>
-
               <td className="verified-column">
                 {a.verified ? (
                   <span className="verified">✔</span>
@@ -50,17 +50,23 @@ export default function ManageAlumni() {
                   <span className="not-verified">✘</span>
                 )}
               </td>
-
               <td>
-                {!a.verified && (
-                  <button className="verify-btn" onClick={() => verify(a.uid)}>
-                    Verify
+                <div className="action-buttons">
+                  {!a.verified && (
+                    <button 
+                      className="verify-btn"
+                      onClick={() => verify(a.uid)}
+                    >
+                      Verify
+                    </button>
+                  )}
+                  <button 
+                    className="delete-btn"
+                    onClick={() => remove(a.uid)}
+                  >
+                    Delete
                   </button>
-                )}
-
-                <button className="delete-btn" onClick={() => remove(a.uid)}>
-                  Delete
-                </button>
+                </div>
               </td>
             </tr>
           ))}

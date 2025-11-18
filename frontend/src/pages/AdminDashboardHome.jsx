@@ -28,32 +28,163 @@ export default function AdminDashboardHome() {
   }, []);
 
   return (
-    <div className="dashboard-home">
-      <div className="profile-card">
-        <h3>Admin Dashboard</h3>
-        <p><strong>Name:</strong> {profile?.name || ""}</p>
-        <p><strong>Email:</strong> {profile?.email || ""}</p>
-        <p><strong>Role:</strong> {profile?.role || ""}</p>
-        <p><strong>Department:</strong> {profile?.department || ""}</p>
-      </div>
+    <div
+      className="dashboard-home"
+      style={{
+        minHeight: "100vh",
+        padding: "40px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "30px",
+        alignItems: "center",
+        background: "linear-gradient(135deg, #0a0f24, #2b1047)",
+        color: "white",
+      }}
+    >
+      {/* PROFILE CARD */}
+      <div
+  className="admin-profile-box"
+  style={{
+    width: "450px",
+    background: "rgba(255, 255, 255, 0.07)",
+    borderRadius: "22px",
+    padding: "40px 30px",
+    margin: "auto",
+    backdropFilter: "blur(16px)",
+    border: "1px solid rgba(255, 255, 255, 0.25)",
+    boxShadow: "0 0 25px rgba(0,0,0,0.4)",
+    textAlign: "center",
+  }}
+>
+  <h2
+    style={{
+      fontWeight: "700",
+      marginBottom: "25px",
+      background: "linear-gradient(90deg,#d56bff,#6c8bff)",
+      WebkitBackgroundClip: "text",
+      color: "transparent",
+    }}
+  >
+    My Profile
+  </h2>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h4>Students</h4>
-          <p className="stat-number">{counts.students}</p>
-        </div>
-        <div className="stat-card">
-          <h4>Alumni</h4>
-          <p className="stat-number">{counts.alumni}</p>
-        </div>
-        <div className="stat-card">
-          <h4>Events</h4>
-          <p className="stat-number">{counts.events}</p>
-        </div>
-        <div className="stat-card">
-          <h4>Jobs</h4>
-          <p className="stat-number">{counts.jobs}</p>
-        </div>
+  {/* Avatar */}
+  <div
+    style={{
+      width: "95px",
+      height: "95px",
+      borderRadius: "50%",
+      margin: "0 auto 25px auto",
+      background: "linear-gradient(145deg,#c47bff,#7483ff)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      fontSize: "40px",
+      fontWeight: "700",
+      color: "white",
+    }}
+  >
+    {profile?.name?.[0]?.toUpperCase() || "A"}
+  </div>
+
+  {/* Info Fields */}
+ {/* Info Fields */}
+{[
+  { label: "Name", value: profile?.name },
+  { label: "Email", value: profile?.email },
+  { label: "Role", value: profile?.role },
+  { label: "Department", value: profile?.department },
+].map((item, i) => (
+  <div
+    key={i}
+    style={{
+      marginBottom: "18px",
+      display: "grid",
+      gridTemplateColumns: "1fr 2fr",
+      alignItems: "center",
+      width: "100%",
+      gap: "10px",
+    }}
+  >
+    {/* LABEL */}
+    <div
+      style={{
+        fontSize: "16px",
+        opacity: 0.85,
+        textAlign: "left",
+      }}
+    >
+      {item.label} :
+    </div>
+
+    {/* VALUE */}
+    <div
+      style={{
+        fontSize: "17px",
+        fontWeight: 600,
+        textAlign: "left",
+      }}
+    >
+      {item.value || "—"}
+    </div>
+
+    <div
+      style={{
+        gridColumn: "1 / span 2",
+        height: "1px",
+        background: "rgba(255,255,255,0.18)",
+        marginTop: "6px",
+      }}
+    ></div>
+  </div>
+))}
+
+</div>
+
+
+      {/* STATS */}
+      <div
+        className="stats-grid"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+          gap: "20px",
+          width: "90%",
+          maxWidth: "900px",
+        }}
+      >
+        {Object.entries(counts).map(([key, value]) => (
+          <div
+            className="stat-card"
+            key={key}
+            style={{
+              background: "rgba(255,255,255,0.1)",
+              padding: "25px",
+              borderRadius: "16px",
+              textAlign: "center",
+              border: "1px solid rgba(255,255,255,0.18)",
+              backdropFilter: "blur(10px)",
+              fontWeight: "600",
+              transition: "0.3s",
+            }}
+          >
+            <h4 style={{ textTransform: "capitalize" }}>{key}</h4>
+            <p
+  className="stat-number"
+  style={{
+    fontSize: "40px",
+    fontWeight: "800",
+    marginTop: "10px",
+    background: "linear-gradient(90deg,#ff77ff,#77a6ff)",
+    WebkitBackgroundClip: "text",
+    color: "transparent",
+  }}
+>
+
+              {value}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
