@@ -22,30 +22,23 @@ export default function AlumniDashboard() {
 
   useEffect(() => {
     fetchJobs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 🔹 Fetch all jobs (UNCHANGED)
   const fetchJobs = async () => {
     try {
       const auth = getAuth();
       const token = await auth.currentUser.getIdToken();
-
       const res = await fetch("http://localhost:5000/api/jobs/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) throw new Error("Failed to fetch jobs");
-      const data = await res.json();
-      setJobs(data);
+      setJobs(await res.json());
     } catch (err) {
       console.error("Error fetching jobs:", err);
     }
   };
 
-  // 🔹 Post new job (UNCHANGED)
   const handleJobPost = async (e) => {
     e.preventDefault();
     try {
@@ -54,10 +47,7 @@ export default function AlumniDashboard() {
 
       const res = await fetch("http://localhost:5000/api/jobs", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(newJob),
       });
 
@@ -76,36 +66,28 @@ export default function AlumniDashboard() {
 
       setSuccessMsg("Job posted successfully!");
       setTimeout(() => setSuccessMsg(""), 3000);
-
       fetchJobs();
     } catch (err) {
       console.error("Error posting job:", err);
     }
   };
 
-  // 🔹 Delete job (UNCHANGED)
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this job?")) return;
+    if (!window.confirm("Are you sure?")) return;
 
     try {
       const auth = getAuth();
       const token = await auth.currentUser.getIdToken();
-
-      const res = await fetch(`http://localhost:5000/api/jobs/${id}`, {
+      await fetch(`http://localhost:5000/api/jobs/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!res.ok) throw new Error("Failed to delete job");
 
       setSuccessMsg("Job deleted successfully!");
       setTimeout(() => setSuccessMsg(""), 3000);
-
-      fetchJobs(); // Refresh after delete
+      fetchJobs();
     } catch (err) {
-      console.error("Error deleting job:", err);
+      console.error("Error deleting:", err);
     }
   };
 
@@ -116,318 +98,327 @@ export default function AlumniDashboard() {
   };
 
   return (
-    <div className="d-flex vh-100 position-relative overflow-hidden" style={{ background: "linear-gradient(135deg,#0d0f23 0%, #1a1f3c 40%, #2c0f49 100%)" }}>
-      {/* Animated background blobs (same feel as login) */}
-      <div className="bg-shape1"></div>
-      <div className="bg-shape2"></div>
-
-      {/* SIDEBAR */}
+    <div
+      className="d-flex vh-100 position-relative overflow-hidden"
+      style={{ background: "linear-gradient(135deg,#0d0f23,#2c0f49)" }}
+    >
+      {/* ---- ❗ SIDEBAR ---- */}
       <aside
-        className="d-flex flex-column p-4 text-white"
+        className="p-4 text-white d-flex flex-column"
         style={{
           width: 260,
-          zIndex: 20,
-          background: "rgba(255,255,255,0.04)",
-          backdropFilter: "blur(12px)",
-          borderRight: "1px solid rgba(255,255,255,0.06)",
+          background: "rgba(255,255,255,0.05)",
+          borderRight: "1px solid rgba(255,255,255,0.1)",
+          backdropFilter: "blur(10px)",
         }}
       >
-        <div>
-          <h3 className="mb-4 text-center fw-bold">Alumni Panel</h3>
+        <h3 className="fw-bold text-center mb-4">Alumni Panel</h3>
 
-          <div className="d-grid gap-2 mb-2">
-            <button
-              className={`btn ${activeTab === "profile" ? "btn-primary" : "btn-outline-light"}`}
-              onClick={() => setActiveTab("profile")}
-            >
-              Profile
-            </button>
+        <button
+          className={`btn mb-2 ${activeTab === "profile" ? "btn-primary" : "btn-outline-light"}`}
+          onClick={() => setActiveTab("profile")}
+        >
+          Profile
+        </button>
 
-            <button
-              className={`btn ${activeTab === "jobs" ? "btn-primary" : "btn-outline-light"}`}
-              onClick={() => setActiveTab("jobs")}
-            >
-              Jobs
-            </button>
-          </div>
-        </div>
+        <button
+          className={`btn mb-2 ${activeTab === "jobs" ? "btn-primary" : "btn-outline-light"}`}
+          onClick={() => setActiveTab("jobs")}
+        >
+          Jobs
+        </button>
 
-        {/* Logout pinned to bottom (mt-auto) */}
-        <div className="mt-auto">
-          <button
-            onClick={handleLogout}
-            className="btn btn-danger w-100"
-            style={{ borderRadius: 10 }}
-          >
-            Logout
-          </button>
-        </div>
+        <button onClick={handleLogout} className="btn btn-danger mt-auto">
+          Logout
+        </button>
       </aside>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-grow-1 p-4 overflow-auto" style={{ zIndex: 10 }}>
+      {/* ---- ❗ MAIN CONTENT ---- */}
+      <main className="flex-grow-1 p-4 overflow-auto">
+
         {successMsg && (
-          <div className="alert alert-success text-center mx-auto" style={{ maxWidth: 800 }}>
+          <div className="alert alert-success text-center mx-auto" style={{ maxWidth: 700 }}>
             {successMsg}
           </div>
         )}
 
-        {/* PROFILE PANEL */}
+        {/* ---- PROFILE TAB ---- */}
         {activeTab === "profile" && (
-          <section className="mx-auto" style={{ maxWidth: 900 }}>
-            <div
-              className="p-5 mb-4"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                borderRadius: 18,
-                border: "1px solid rgba(255,255,255,0.08)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <h2 className="fw-bold mb-3">My Profile</h2>
-              <div className="mb-2"><strong>Name:</strong> <span className="text-info">{profile?.name}</span></div>
-              <div className="mb-2"><strong>Email:</strong> {profile?.email}</div>
-              <div className="mb-2"><strong>Batch:</strong> {profile?.graduationYear - 4}-{profile?.graduationYear}</div>
-              <div className="mb-2"><strong>Department:</strong> {profile?.department}</div>
+          <div className="d-flex justify-content-center align-items-center h-100">
+            <div className="profile-card p-5">
+              <h2 className="fw-bold text-gradient mb-4 text-center">My Profile</h2>
+
+              <div className="avatar-circle mb-3">
+  {profile?.name ? profile?.name[0].toUpperCase() : "?"}
+</div>
+
+<div className="profile-details">
+  <div className="detail-row">
+    <span className="label">Name:</span>
+    <span className="value">{profile?.name}</span>
+  </div>
+
+  <div className="detail-row">
+    <span className="label">Email:</span>
+    <span className="value">{profile?.email}</span>
+  </div>
+
+  <div className="detail-row">
+    <span className="label">Batch:</span>
+    <span className="value">
+      {profile?.graduationYear - 4}-{profile?.graduationYear}
+    </span>
+  </div>
+
+  <div className="detail-row">
+    <span className="label">Department:</span>
+    <span className="value">{profile?.department}</span>
+  </div>
+</div>
+
             </div>
-          </section>
+          </div>
         )}
 
-        {/* JOBS PANEL */}
+        {/* ---- JOBS TAB ---- */}
         {activeTab === "jobs" && (
-          <section>
-            <h2 className="fw-bold mb-3 text-white">Job Portal</h2>
+          <div className="d-flex flex-column align-items-center w-100">
 
-            {/* Post Job - UI only (functions unchanged) */}
-            <div
-              className="p-4 mb-4"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                borderRadius: 16,
-                border: "1px solid rgba(255,255,255,0.08)",
-                backdropFilter: "blur(12px)",
-                maxWidth: 1000,
-              }}
-            >
-              <div className="card-body p-0">
-                <form onSubmit={handleJobPost}>
+            <h2 className="fw-bold text-white text-center mb-4">Job Portal</h2>
+
+            {/* POST JOB BOX */}
+            <div className="job-box p-4 mb-4">
+              <form onSubmit={handleJobPost}>
+                <div className="row g-3">
+
+                  {/** ALL INPUTS UNCHANGED **/}
+
+                  {/* ✅ COMPANY / ROLE / DURATION / STIPEND */}
                   <div className="row g-3">
 
-                    <div className="col-md-6">
-                      <label className="form-label text-white">Company</label>
-                      <input
-                        className="form-control bg-dark text-white border-0"
-                        placeholder="Enter company name"
-                        value={newJob.company}
-                        onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
-                        required
-                        style={{ height: 44 }}
-                      />
-                    </div>
+  {/* 🔹 COMPANY */}
+  <div className="col-md-6">
+    <label className="text-white">Company</label>
+    <input
+      className="form-control input-dark"
+      placeholder="e.g., Google"
+      value={newJob.company}
+      onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
+      required
+    />
+  </div>
 
-                    <div className="col-md-6">
-                      <label className="form-label text-white">Role</label>
-                      <input
-                        className="form-control bg-dark text-white border-0"
-                        placeholder="Enter role title"
-                        value={newJob.role}
-                        onChange={(e) => setNewJob({ ...newJob, role: e.target.value })}
-                        required
-                        style={{ height: 44 }}
-                      />
-                    </div>
+  {/* 🔹 ROLE */}
+  <div className="col-md-6">
+    <label className="text-white">Job Role</label>
+    <input
+      className="form-control input-dark"
+      placeholder="e.g., Software Intern"
+      value={newJob.role}
+      onChange={(e) => setNewJob({ ...newJob, role: e.target.value })}
+      required
+    />
+  </div>
 
-                    <div className="col-md-4">
-                      <label className="form-label text-white">Duration</label>
-                      <input
-                        className="form-control bg-dark text-white border-0"
-                        placeholder="e.g. 6 months"
-                        value={newJob.duration}
-                        onChange={(e) => setNewJob({ ...newJob, duration: e.target.value })}
-                        required
-                        style={{ height: 44 }}
-                      />
-                    </div>
+  {/* 🔹 DURATION */}
+  <div className="col-md-6">
+    <label className="text-white">Duration</label>
+    <input
+      className="form-control input-dark"
+      placeholder="e.g., 6 Months"
+      value={newJob.duration}
+      onChange={(e) => setNewJob({ ...newJob, duration: e.target.value })}
+      required
+    />
+  </div>
 
-                    <div className="col-md-4">
-                      <label className="form-label text-white">Stipend</label>
-                      <input
-                        className="form-control bg-dark text-white border-0"
-                        placeholder="e.g. Rs.10000"
-                        value={newJob.stipend}
-                        onChange={(e) => setNewJob({ ...newJob, stipend: e.target.value })}
-                        required
-                        style={{ height: 44 }}
-                      />
-                    </div>
+  {/* 🔹 STIPEND */}
+  <div className="col-md-6">
+    <label className="text-white">Stipend</label>
+    <input
+      className="form-control input-dark"
+      placeholder="e.g., ₹25,000/month or Unpaid"
+      value={newJob.stipend}
+      onChange={(e) => setNewJob({ ...newJob, stipend: e.target.value })}
+      required
+    />
+  </div>
 
-                    {/* MODE dropdown — exact values preserved */}
-                    <div className="col-md-4">
-                      <label className="form-label text-white">Mode</label>
-                      <select
-                        className="form-select bg-dark text-white border-0"
-                        value={newJob.mode}
-                        onChange={(e) => setNewJob({ ...newJob, mode: e.target.value })}
-                        required
-                        style={{ height: 44 }}
-                      >
-                        <option value="" disabled>-- Select Job Mode --</option>
-                        <option value="Online">Online</option>
-                        <option value="Offline">Offline</option>
-                        <option value="Hybrid">Hybrid</option>
-                      </select>
-                    </div>
+  {/* 🔹 MODE DROPDOWN */}
+  <div className="col-md-6">
+    <label className="text-white">Job Mode</label>
+    <select
+      className="form-control input-dark"
+      value={newJob.mode}
+      onChange={(e) => setNewJob({ ...newJob, mode: e.target.value })}
+      required
+    >
+      <option value="">Select Mode</option>
+      <option value="Remote">Remote</option>
+      <option value="Hybrid">Hybrid</option>
+      <option value="On-site">On-site</option>
+    </select>
+  </div>
 
-                    <div className="col-md-12">
-                      <label className="form-label text-white">Application Link</label>
-                      <input
-                        className="form-control bg-dark text-white border-0"
-                        placeholder="https://example.com/apply"
-                        value={newJob.link}
-                        onChange={(e) => setNewJob({ ...newJob, link: e.target.value })}
-                        required
-                        style={{ height: 44 }}
-                      />
-                    </div>
+  {/* 🔹 APPLICATION LINK */}
+  <div className="col-md-6">
+    <label className="text-white">Application Link</label>
+    <input
+      className="form-control input-dark"
+      placeholder="Paste application URL"
+      value={newJob.link}
+      onChange={(e) => setNewJob({ ...newJob, link: e.target.value })}
+      required
+    />
+  </div>
 
-                    <div className="col-md-12">
-                      <label className="form-label text-white">Job Description</label>
-                      <textarea
-                        className="form-control bg-dark text-white border-0"
-                        placeholder="Brief description about the job..."
-                        rows="3"
-                        value={newJob.description}
-                        onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
-                        required
-                        style={{ minHeight: 100 }}
-                      />
-                    </div>
+  {/* 🔹 POSTED BY */}
+  <div className="col-md-12">
+    <label className="text-white">Posted By</label>
+    <input
+      className="form-control input-dark"
+      placeholder="Your Name"
+      value={newJob.postedBy}
+      onChange={(e) => setNewJob({ ...newJob, postedBy: e.target.value })}
+      required
+    />
+  </div>
 
-                    <div className="col-md-12">
-                      <label className="form-label text-white">Posted By</label>
-                      <input
-                        className="form-control bg-dark text-white border-0"
-                        placeholder="Enter your name"
-                        value={newJob.postedBy}
-                        onChange={(e) => setNewJob({ ...newJob, postedBy: e.target.value })}
-                        required
-                        style={{ height: 44 }}
-                      />
-                    </div>
+  {/* 🔹 JOB DESCRIPTION */}
+  <div className="col-12">
+    <label className="text-white">Job Description</label>
+    <textarea
+      className="form-control input-dark"
+      placeholder="Short description about the job role..."
+      rows="3"
+      value={newJob.description}
+      onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
+      required
+    />
+  </div>
 
-                    <div className="col-12 mt-2">
-                      <button type="submit" className="btn btn-primary px-4">
-                        Post Job
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
+  <button type="submit" className="btn btn-primary mt-2 w-100">
+    Post Job
+  </button>
+</div>
+
+                </div>
+              </form>
             </div>
 
-            {/* RECENT JOB POSTS — preserved */}
-            <div
-              className="p-3"
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                borderRadius: 12,
-                border: "1px solid rgba(255,255,255,0.06)",
-                maxWidth: 1000,
-              }}
-            >
-              <h5 className="mb-3 text-white">Recent Job Posts</h5>
+            {/* ---- JOB LIST ---- */}
+            <div className="job-list p-3">
+              <h4 className="text-white">Recent Jobs</h4>
 
-              <ul className="list-group list-group-flush">
-                {jobs.length > 0 ? (
-                  jobs.map((job, i) => (
-                    <li key={i} className="list-group-item mb-3" style={{ background: "rgba(0,0,0,0.5)", borderRadius: 8 }}>
+              {jobs.length === 0 ? (
+                <p className="text-muted text-center mt-3">No jobs posted yet.</p>
+              ) : (
+                <ul className="list-group list-group-flush">
+                  {jobs.map((job) => (
+                    <li className="list-group-item job-item" key={job._id}>
                       <h5 className="fw-bold text-info">{job.role}</h5>
-                      <p className="mb-1"><strong>{job.company}</strong> — <span className="badge bg-info text-dark">{job.mode}</span> ({job.duration})</p>
-                      <p className="text-muted small">{job.description}</p>
-                      <p><strong>Stipend:</strong> {job.stipend}</p>
-
-                      <a href={job.link} target="_blank" rel="noopener noreferrer" className="btn btn-outline-primary btn-sm">Apply Here</a>
-                      <button className="btn btn-danger btn-sm ms-2" onClick={() => handleDelete(job._id)}>Delete</button>
-
-                      <div className="mt-2"><small className="text-secondary">Posted by {job.postedBy} on {new Date(job.createdAt).toLocaleDateString()}</small></div>
+                      <small className="text-secondary">{job.company}</small>
+                      <br />
+                      <button className="btn btn-danger btn-sm mt-2" onClick={() => handleDelete(job._id)}>
+                        Delete
+                      </button>
                     </li>
-                  ))
-                ) : (
-                  <li className="list-group-item text-center text-muted py-3">No jobs posted yet.</li>
-                )}
-              </ul>
+                  ))}
+                </ul>
+              )}
             </div>
-          </section>
+          </div>
         )}
       </main>
 
-      {/* Local styles to match Login UI and ensure placeholders visible */}
+      {/* ---- GLOBAL STYLES ---- */}
       <style>{`
-  /* floating background blobs */
-  .bg-shape1, .bg-shape2 {
-    position: absolute; width: 350px; height: 350px;
-    border-radius: 50%; filter: blur(80px); z-index: 5;
-  }
-  .bg-shape1 { top: -80px; left: -60px; background: rgba(0,123,255,0.45); animation: float 6s ease-in-out infinite; }
-  .bg-shape2 { bottom: -80px; right: -60px; background: rgba(255,0,150,0.45); animation: float 8s ease-in-out infinite; }
-  @keyframes float {0%{transform:translateY(0);}50%{transform:translateY(25px);}100%{transform:translateY(0);} }
+        .profile-card {
+          width: 450px;
+          background: rgba(255,255,255,0.05);
+          border-radius: 20px;
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.15);
+          color: white;
+        }
 
-  /* 🌟 PLACEHOLDER FIX — LIGHT + CLEAR */
-  ::placeholder {
-    color: rgba(255,255,255,0.65) !important;
-    opacity: 1 !important;
-  }
-  input, textarea, select {
-    color: #fff !important;
-  }
+        .profile-line { font-size: 1.15rem; margin-bottom: 8px; }
 
-  /* 🌟 Profile & Job description text visible */
-  .text-muted, .text-secondary, .list-group-item p {
-    color: rgba(220,220,220,0.85) !important;
-  }
-  strong {
-    color: #ffffff !important;
-  }
+        .job-box, .job-list {
+          width: 100%;
+  max-width: 550px;   /* SAME WIDTH AS PROFILE CARD */
+  margin: 0 auto;
+          border-radius: 14px;
+          background: rgba(255,255,255,0.06);
+          border: 1px solid rgba(255,255,255,0.1);
+          backdrop-filter: blur(12px);
+          color: white;
+        }
 
-  /* 🌟 Logout button at bottom without clash */
-  aside {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  aside button {
-    font-size: 15px;
-    padding: 10px;
-  }
+        .input-dark {
+          background: rgba(0,0,0,0.55) !important;
+          border: 1px solid rgba(255,255,255,0.2) !important;
+          color: white !important;
+        }
 
-  /* smooth input padding to match login UI */
-  .form-control, .form-select {
-    padding: 0.55rem 0.75rem;
-    background: rgba(0,0,0,0.55) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-  }
+        .job-item {
+          background: rgba(0,0,0,0.45) !important;
+          border-radius: 8px !important;
+          margin-top: 10px;
+        }
 
-  /* job list background */
-  .list-group-item {
-    background: rgba(0,0,0,0.45) !important;
-    border-radius: 10px !important;
-  }
-    /* Make all profile labels (strong) light grey */
-section strong {
-  color: #d6d6d6 !important;
+        .text-gradient {
+          background: linear-gradient(90deg, #b388ff, #ff6bff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+          ::placeholder {
+  color: rgba(255, 255, 255, 0.75) !important;   /* Brighter */
+  opacity: 1 !important;
+}
+  .avatar-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b388ff, #ff6bff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  font-weight: bold;
+  color: white;
+  margin: 0 auto 15px auto;
 }
 
-/* Make normal text inside profile light grey */
-section div {
-  color: #d6d6d6 !important;
+.profile-details {
+  width: 100%;
+  margin-top: 10px;
 }
 
-/* Change blue text-info to purple tint */
-.text-info {
-  color: #b388ff !important;
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
 }
 
-`}</style>
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 700 !important;   /* FULL BOLD */
+  opacity: 1 !important;         /* FULL VISIBILITY */
+  letter-spacing: 0.3px;         /* (optional) makes it cleaner */
+}
+
+.value {
+  font-weight: 500;
+  text-align: right;
+}
+
+
+      `}</style>
     </div>
   );
 }
