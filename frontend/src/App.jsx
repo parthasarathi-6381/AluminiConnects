@@ -37,7 +37,7 @@ export default function App() {
   const location = useLocation();
 
   // Paths where navbar should NOT appear
-  const hideNavbarPaths = ["/login", "/signup", "/forgot-password"];
+  const hideNavbarPaths = ["/login", "/signup", "/forgot-password","/complete-profile"];
 
   // Navbar shows only when user is logged in + not on auth pages
   const shouldShowNavbar =

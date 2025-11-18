@@ -240,27 +240,41 @@ export const registerForEvent = async (req, res) => {
   try {
     const { eventId } = req.params;
     const { uid, email, role } = req.user;
-    const user = await User.findOne({ uid });
-    // Only students and alumni can register
-    if (role==="admin")
+
+    // ❌ Admin cannot register 
+    if (role === "admin") {
       return res.status(403).json({ message: "Only students or alumni can register" });
+    }
+
+    // ⭐ Fetch from both models
+    let user = await User.findOne({ uid });
+    if (!user) {
+      const AlumniModel = (await import("../models/alumni.js")).default;
+      user = await AlumniModel.findOne({ uid });
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found in system" });
+    }
 
     const event = await Event.findById(eventId);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
-    if (event.status !== "upcoming")
+    if (event.status !== "upcoming") {
       return res.status(400).json({ message: "Registrations closed for this event" });
+    }
 
-    // Check if already registered
+    // Already registered?
     const alreadyRegistered = await Registration.findOne({ eventId, userId: uid });
-    if (alreadyRegistered)
+    if (alreadyRegistered) {
       return res.status(400).json({ message: "You have already registered for this event" });
+    }
 
     // Create registration entry
     const registration = new Registration({
       eventId,
       userId: uid,
-      name:user.name,
+      name: user.name,
       email,
       role,
     });
@@ -271,11 +285,13 @@ export const registerForEvent = async (req, res) => {
       message: "Registered successfully",
       registration,
     });
+
   } catch (error) {
-    console.error(error);
+    console.error("Register event error:", error);
     res.status(500).json({ message: "Error registering for event", error });
   }
 };
+
 
 // to fetch all the events which have been posted(ethier upcoming or completed or ongoing) 
 // @public route
