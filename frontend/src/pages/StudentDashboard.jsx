@@ -13,7 +13,7 @@ import "./StudentDashboard.css";
 export default function StudentDashboard() {
   const { profile } = useAuth();
   const [posts, setPosts] = useState([]);
-  const [activeTab, setActiveTab] = useState("feed");
+  const [activeTab, setActiveTab] = useState("profile");
   const [selectedEventId, setSelectedEventId] = useState(null);
 
   const navigate = useNavigate();
@@ -48,55 +48,49 @@ export default function StudentDashboard() {
   >
 
     {/* LEFT SIDEBAR */}
-    <aside
-      className="p-4 text-white d-flex flex-column"
-      style={{
-        width: 260,
-        background: "rgba(255,255,255,0.05)",
-        borderRight: "1px solid rgba(255,255,255,0.1)",
-        backdropFilter: "blur(10px)"
-      }}
-    >
-      <h4 className="fw-bold text-center mb-4">Student Panel</h4>
-
-      {/* 🔹 MOVE PROFILE FIRST */}
-<button
-  className={`btn mb-2 ${activeTab === "profile" ? "btn-primary" : "btn-outline-light"}`}
-  onClick={() => switchTab("profile")}
+    {/* LEFT SIDEBAR */}
+<aside
+  className="p-4 text-white d-flex flex-column"
+  style={{
+    width: 260,
+    background: "rgba(255,255,255,0.05)",
+    borderRight: "1px solid rgba(255,255,255,0.1)",
+    backdropFilter: "blur(10px)"
+  }}
 >
-  My Profile
-</button>
+  <h4 className="fw-bold text-center mb-4">Student Panel</h4>
 
-<button
-  className={`btn mb-2 ${activeTab === "feed" ? "btn-primary" : "btn-outline-light"}`}
-  onClick={() => switchTab("feed")}
->
-  Feed
-</button>
+  {/* 🔹 PROFILE FIRST */}
+  <button
+    className={`btn mb-2 ${activeTab === "profile" ? "btn-primary" : "btn-outline-light"}`}
+    onClick={() => switchTab("profile")}
+  >
+    My Profile
+  </button>
 
-
-      {profile?.role === "clubMember" && (
-        <>
-          <button
-            className={`btn mb-2 ${activeTab === "create" ? "btn-primary" : "btn-outline-light"}`}
-            onClick={() => switchTab("create")}
-          >
-            Create Event
-          </button>
-
-          <button
-            className={`btn mb-2 ${activeTab === "my-events" ? "btn-primary" : "btn-outline-light"}`}
-            onClick={() => switchTab("my-events")}
-          >
-            My Events
-          </button>
-        </>
-      )}
-
-      <button className="btn btn-danger mt-auto" onClick={loggingOut}>
-        Logout
+  {profile?.role === "clubMember" && (
+    <>
+      <button
+        className={`btn mb-2 ${activeTab === "create" ? "btn-primary" : "btn-outline-light"}`}
+        onClick={() => switchTab("create")}
+      >
+        Create Event
       </button>
-    </aside>
+
+      <button
+        className={`btn mb-2 ${activeTab === "my-events" ? "btn-primary" : "btn-outline-light"}`}
+        onClick={() => switchTab("my-events")}
+      >
+        My Events
+      </button>
+    </>
+  )}
+
+  <button className="btn btn-danger mt-auto" onClick={loggingOut}>
+    Logout
+  </button>
+</aside>
+
 
     {/* MAIN CONTENT */}
     <main className="flex-grow-1 p-4 overflow-auto text-white">
@@ -146,6 +140,10 @@ export default function StudentDashboard() {
     <span className="label">Department:</span>
     <span className="value">{profile?.department}</span>
   </div>
+    <div className="detail-row">
+          <span className="label">Role:</span>
+          <span className="value">{profile?.role || "N/A"}</span>
+        </div>
 </div>
 
 
@@ -154,11 +152,6 @@ export default function StudentDashboard() {
 )}
 
 
-      {activeTab === "feed" && (
-        <div className="content-card p-3">
-          <PostFeed posts={posts} />
-        </div>
-      )}
 
       {activeTab === "create" && (
         <div className="content-card p-4 dark-form">
