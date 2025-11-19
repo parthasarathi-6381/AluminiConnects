@@ -17,7 +17,9 @@ export default function AdminEventRegistrations() {
 
   async function load(pageNum) {
     try {
-      const res = await api.get(`/api/events/${eventId}/registrations?page=${pageNum}`);
+      const res = await api.get(
+        `/api/events/${eventId}/registrations?page=${pageNum}`
+      );
       setEvent(res.data.event);
       setRegistrations(res.data.registeredUsers);
       setPagination(res.data.pagination);
@@ -27,7 +29,7 @@ export default function AdminEventRegistrations() {
     }
   }
 
-  // 🔥 FIXED DOWNLOAD FUNCTION WITH TOKEN
+  // 🔥 EXPORT EXCEL
   async function handleExport() {
     try {
       const res = await api.get(
@@ -50,10 +52,25 @@ export default function AdminEventRegistrations() {
     }
   }
 
+  // 🔍 VIEW BUTTON HANDLER
+  function handleView(regData) {
+    console.log("VIEW REG:", regData);
+    alert(`Viewing registration of: ${regData.name}`);
+  }
+
+  // ❌ DELETE BUTTON HANDLER
+  function handleDelete(regData) {
+    console.log("DELETE REG:", regData);
+    alert(`Delete API not implemented yet for: ${regData.email}`);
+  }
+
   return (
     <div className="admin-reg-container">
       <h2>Registrations for: {event?.title}</h2>
-      <p><strong>Date:</strong> {event && new Date(event.date).toLocaleDateString()}</p>
+      <p>
+        <strong>Date:</strong>{" "}
+        {event && new Date(event.date).toLocaleDateString()}
+      </p>
 
       <button className="export-btn" onClick={handleExport}>
         ⬇ Export to Excel
@@ -62,9 +79,14 @@ export default function AdminEventRegistrations() {
       <table className="reg-table">
         <thead>
           <tr>
-            <th>Name</th><th>Email</th><th>Role</th><th>Registered At</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Registered At</th>
+            <th style={{ textAlign: "center" }}>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {registrations.map((r) => (
             <tr key={r._id}>
@@ -72,6 +94,22 @@ export default function AdminEventRegistrations() {
               <td>{r.email}</td>
               <td>{r.role}</td>
               <td>{new Date(r.registeredAt).toLocaleString()}</td>
+
+              <td style={{ display: "flex", gap: "14px", justifyContent: "center" }}>
+                <button
+                  className="action-btn view-btn"
+                  onClick={() => handleView(r)}
+                >
+                  View
+                </button>
+
+                <button
+                  className="action-btn delete-btn"
+                  onClick={() => handleDelete(r)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

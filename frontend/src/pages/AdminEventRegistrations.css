@@ -112,3 +112,52 @@
   cursor: not-allowed;
   transform: none;
 }
+/* ACTION BUTTONS */
+/* SHARED BUTTON BASE */
+.action-btn {
+  padding: 5px 8px;     /* reduce padding */
+  min-width: 60px;      /* reduce width */
+  border-radius: 40px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* VIEW BUTTON */
+.view-btn {
+  min-width: 55px !important;
+  padding: 4px 8px !important;
+}
+
+
+.view-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(0, 200, 255, 0.7);
+  opacity: 0.95;
+}
+
+/* DELETE BUTTON */
+.delete-btn {
+  background: linear-gradient(135deg, #ff4d4d, #ff6b6b);
+  color: #fff;
+  box-shadow: 0 0 6px rgba(255, 60, 60, 0.4);
+}
+
+.delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(255, 60, 60, 0.8);
+  opacity: 0.92;
+}
+td {
+  display: flex;
+  gap: 14px;   /* Increase space */
+  justify-content: center;
+}
+
+
+

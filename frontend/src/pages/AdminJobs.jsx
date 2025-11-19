@@ -43,7 +43,6 @@ export default function AdminJobs() {
   // Create job
   const handleJobPost = async (e) => {
     e.preventDefault();
-
     try {
       const auth = getAuth();
       const token = await auth.currentUser.getIdToken();
@@ -82,7 +81,6 @@ export default function AdminJobs() {
   // Delete job
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this job?")) return;
-
     try {
       const auth = getAuth();
       const token = await auth.currentUser.getIdToken();
@@ -104,151 +102,116 @@ export default function AdminJobs() {
   };
 
   return (
-    <div className="manage-jobs-page" style={{ marginLeft: 230, padding: 20 }}>
-      <h2>Manage Jobs</h2>
+    <div className="jobs-wrapper">
+      <div className="jobs-container">
+        <h2 className="page-title">Manage Jobs</h2>
 
-      {successMsg && (
-        <div className="alert alert-success" style={{ maxWidth: 600 }}>
-          {successMsg}
-        </div>
-      )}
+        {successMsg && <div className="alert-success">{successMsg}</div>}
 
-      {/* Create Job */}
-      <div
-        className="p-4 mb-4"
-        style={{
-          background: "#f5f5f5",
-          borderRadius: 10,
-          maxWidth: 800,
-        }}
-      >
-        <h4>Create New Job</h4>
+        {/* Create Job */}
+        <div className="job-form-box">
+          <h3>Create New Job</h3>
 
-        <form onSubmit={handleJobPost}>
-          <div className="row">
-            <div className="col-md-6 mb-3">
-              <label>Company</label>
+          <form onSubmit={handleJobPost}>
+            <div className="grid-2">
               <input
-                className="form-control"
+                placeholder="Company"
                 value={newJob.company}
                 onChange={(e) =>
                   setNewJob({ ...newJob, company: e.target.value })
                 }
                 required
               />
-            </div>
 
-            <div className="col-md-6 mb-3">
-              <label>Role</label>
               <input
-                className="form-control"
+                placeholder="Role"
                 value={newJob.role}
                 onChange={(e) => setNewJob({ ...newJob, role: e.target.value })}
                 required
               />
             </div>
 
-            <div className="col-md-4 mb-3">
-              <label>Duration</label>
+            <div className="grid-3">
               <input
-                className="form-control"
+                placeholder="Duration"
                 value={newJob.duration}
                 onChange={(e) =>
                   setNewJob({ ...newJob, duration: e.target.value })
                 }
                 required
               />
-            </div>
 
-            <div className="col-md-4 mb-3">
-              <label>Stipend</label>
               <input
-                className="form-control"
+                placeholder="Stipend"
                 value={newJob.stipend}
                 onChange={(e) =>
                   setNewJob({ ...newJob, stipend: e.target.value })
                 }
                 required
               />
-            </div>
 
-            <div className="col-md-4 mb-3">
-              <label>Mode</label>
               <select
-                className="form-select"
                 value={newJob.mode}
                 onChange={(e) =>
                   setNewJob({ ...newJob, mode: e.target.value })
                 }
                 required
               >
-                <option value="">Select mode</option>
-                <option value="Online">Online</option>
-                <option value="Offline">Offline</option>
-                <option value="Hybrid">Hybrid</option>
+                <option value="">Select Mode</option>
+                <option>Online</option>
+                <option>Offline</option>
+                <option>Hybrid</option>
               </select>
             </div>
 
-            <div className="col-md-12 mb-3">
-              <label>Application Link</label>
-              <input
-                className="form-control"
-                value={newJob.link}
-                onChange={(e) =>
-                  setNewJob({ ...newJob, link: e.target.value })
-                }
-                required
-              />
-            </div>
+            <input
+              placeholder="Application Link"
+              value={newJob.link}
+              onChange={(e) =>
+                setNewJob({ ...newJob, link: e.target.value })
+              }
+              required
+            />
 
-            <div className="col-md-12 mb-3">
-              <label>Description</label>
-              <textarea
-                className="form-control"
-                rows={3}
-                value={newJob.description}
-                onChange={(e) =>
-                  setNewJob({ ...newJob, description: e.target.value })
-                }
-                required
-              />
-            </div>
+            <textarea
+              placeholder="Job Description"
+              rows="3"
+              value={newJob.description}
+              onChange={(e) =>
+                setNewJob({ ...newJob, description: e.target.value })
+              }
+              required
+            />
 
-            <button type="submit" className="btn btn-primary">
-              Create Job
-            </button>
-          </div>
-        </form>
+            <button className="btn-create">Create Job</button>
+          </form>
+        </div>
+
+        {/* JOB LIST */}
+        <h3 className="sub-title">All Jobs</h3>
+
+        {jobs.length === 0 ? (
+          <p className="no-jobs">No jobs available</p>
+        ) : (
+          <ul className="job-list">
+            {jobs.map((job) => (
+              <li key={job._id} className="job-card">
+                <div>
+                  <strong>{job.role}</strong> @ {job.company}
+                  <p>Mode: {job.mode} | Stipend: {job.stipend}</p>
+                </div>
+
+                <button
+                  className="btn-delete"
+                  onClick={() => handleDelete(job._id)}
+                >
+                  ✖
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-
-      {/* Jobs List */}
-      <h4>All Jobs</h4>
-
-      {jobs.length === 0 ? (
-        <p>No jobs available</p>
-      ) : (
-        <ul className="list-group" style={{ maxWidth: 800 }}>
-          {jobs.map((job) => (
-            <li
-              key={job._id}
-              className="list-group-item d-flex justify-content-between"
-            >
-              <div>
-                <strong>{job.role}</strong> at {job.company}
-                <div>Mode: {job.mode}</div>
-                <div>Stipend: {job.stipend}</div>
-              </div>
-
-              <button
-                className="btn btn-danger btn-sm"
-                onClick={() => handleDelete(job._id)}
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

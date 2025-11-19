@@ -176,6 +176,12 @@ export default function AlumniDashboard() {
   </div>
 </div>
 
+<div className="detail-row">
+  <span className="label">Role:</span>
+  <span className="value">{profile?.role || "N/A"}</span>
+</div>
+
+
             </div>
           </div>
         )}

@@ -40,8 +40,6 @@ export default function CreateEvent() {
       });
 
       alert(res.data.message || "Event Created Successfully!");
-
-      // Reset form
       setTitle("");
       setDescription("");
       setVenue("");
@@ -49,19 +47,40 @@ export default function CreateEvent() {
       setEventDate(new Date());
       setEventTime(new Date());
     } catch (err) {
-      console.error("Error creating event:", err);
-      alert("Failed to create event: " + (err.response?.data?.message || err.message));
+      alert("Failed: " + (err.response?.data?.message || err.message));
     }
   };
 
+  const quillModules = {
+  toolbar: [
+    ["bold", "italic", "underline", "strike"],      
+    [{ header: 1 }, { header: 2 }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ align: [] }],
+    ["link"],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "list",
+  "bullet",
+  "link",
+  "align",
+];
+
+
   return (
-    <div className="create-container">
-      <h2>Create Event</h2>
+  <div className="modern-wrapper">
+    <div className="modern-container">
+      <h2 className="page-title">Create Event</h2>
 
-      {/* 🔥 Admin Only — View Event Registrations */}
-      
-
-      <form className="create-form" onSubmit={submitEvent}>
+      <form className="form-modern" onSubmit={submitEvent}>
         <label>Event Title</label>
         <input
           type="text"
@@ -73,10 +92,13 @@ export default function CreateEvent() {
 
         <label>Description</label>
         <ReactQuill
-          value={description}
-          onChange={setDescription}
-          theme="snow"
-        />
+  value={description}
+  onChange={setDescription}
+  theme="snow"
+  modules={quillModules}
+  formats={quillFormats}
+/>
+
 
         <label>Venue</label>
         <input
@@ -114,10 +136,12 @@ export default function CreateEvent() {
           className="date-picker"
         />
 
-        <button type="submit" className="submit-btn">
+        <button type="submit" className="btn-modern">
           Create Event
         </button>
       </form>
     </div>
-  );
+  </div>
+);
+
 }
