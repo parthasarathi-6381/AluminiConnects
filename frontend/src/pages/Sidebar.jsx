@@ -13,6 +13,7 @@ export default function Sidebar() {
         <li onClick={() => navigate("/admin")}>Dashboard</li>
         <li onClick={() => navigate("/admin/create-event")}>Create Event</li>
         <li onClick={() => navigate("/admin/jobs")}>Create Job / Internship</li>
+        <li onClick={() => navigate("/admin/achievements")}>Manage Achievements</li>
 
         <li className="section-title">Manage Users</li>
         <li onClick={() => navigate("/admin/students")}>Students</li>
