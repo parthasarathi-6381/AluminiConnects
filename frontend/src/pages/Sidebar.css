@@ -1,62 +1,84 @@
-/* src/pages/Sidebar.css */
-
 .sidebar {
-  width: 230px;
-  background: #000000; /* 🔥 PURE BLACK */
-  color: #ffffff; /* default text color */
-  padding: 20px;
-
+  width: 250px;
+  height: 100vh;
   position: fixed;
-  top: 60px; /* place below fixed navbar */
   left: 0;
+  top: 0;
+  padding: 25px 18px;
 
-  height: calc(100vh - 60px);
-  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
-  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+
+  color: white;
 }
 
-/* Title */
-.sidebar h2 {
+.side-title {
+  font-size: 24px;
+  font-weight: 800;
+  text-align: center;
   margin-bottom: 20px;
-  font-size: 22px;
-  color: #ffffff; /* white */
+
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-/* List styles */
-.sidebar ul {
+.menu {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.sidebar li {
-  padding: 12px 0;
+.menu li {
+  background: rgba(255, 255, 255, 0.17);
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+
+  font-size: 16px;
+  font-weight: 500;
+
   cursor: pointer;
-  font-size: 15px;
-  color: #fff6f6; /* soft white */
-  transition: 0.2s;
+  transition: 0.25s ease;
+  border: 1px solid transparent;
 }
 
-/* Hover effect */
-.sidebar li:hover {
-  color: #60a5fa; /* blue highlight */
+/* Hover */
+.menu li:hover {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transform: translateX(6px);
+  background: rgba(255, 255, 255, 0.25);
 }
 
-.sidebar p{
-    color:#00ffe5
-}
-
-/* Section title */
+/* Section Title */
 .section-title {
-  margin-top: 25px;
-  color: #000000; /* grey */
-  font-size: 13px;
-  text-transform: uppercase;
+  margin: 14px 4px 8px;
+  font-size: 14px;
+  opacity: 0.8;
+  font-weight: 600;
 }
 
-/* Logout button styling */
+/* Logout Button */
 .logout {
-  margin-top: 40px;
-  color: #ef4444 !important; /* red logout */
+  background: rgba(255, 0, 0, 0.35) !important;
+  color: #ffdede;
+}
+
+.logout:hover {
+  background: rgba(255, 0, 0, 0.55) !important;
+  transform: translateX(6px);
+}
+/* Active Page */
+.menu li.active {
+  background: linear-gradient(90deg,#8da9ff,#c985ff);
+  color: white;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.75);
+  transform: translateX(6px);
 }
