@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useAuth } from "../components/AuthProvider";
-import "./StudentDashboard.css";
 
 export default function MyEvents({ onViewRegistrations }) {
   const [events, setEvents] = useState([]);
@@ -31,8 +30,21 @@ export default function MyEvents({ onViewRegistrations }) {
     }
   }
 
+  const containerStyle = {
+    background: "transparent",
+    padding: "20px",
+  };
+
+  const eventCardStyle = {
+    background: "transparent",
+    border: "1px solid rgba(255,255,255,0.15)",
+    borderRadius: "12px",
+    padding: "18px",
+    marginBottom: "15px",
+  };
+
   return (
-    <div className="container mt-4 text-white">
+    <div className="container mt-4 text-white" style={containerStyle}>
       <h2>My Created Events</h2>
 
       <div className="mt-4">
@@ -44,14 +56,7 @@ export default function MyEvents({ onViewRegistrations }) {
             ev?.createdBy?.uid === profile?.uid;
 
           return (
-            <div
-              key={ev._id}
-              className="p-3 mb-3"
-              style={{
-                background: "rgba(0,0,0,0.4)",
-                borderRadius: "10px",
-              }}
-            >
+            <div key={ev._id} style={eventCardStyle}>
               <h4 className="text-info">{ev.title}</h4>
               <p><strong>Date:</strong> {ev.date.split("T")[0]}</p>
               <p><strong>Venue:</strong> {ev.venue}</p>
@@ -63,7 +68,6 @@ export default function MyEvents({ onViewRegistrations }) {
                 View Registrations
               </button>
 
-              {/* DELETE BUTTON SHOWN ONLY TO ADMIN OR OWNER */}
               {canDelete && (
                 <button
                   className="btn btn-danger btn-sm"

@@ -95,13 +95,9 @@ export default function AdminEventRegistrations() {
               <td>{r.role}</td>
               <td>{new Date(r.registeredAt).toLocaleString()}</td>
 
-              <td style={{ display: "flex", gap: "14px", justifyContent: "center" }}>
-                <button
-                  className="action-btn view-btn"
-                  onClick={() => handleView(r)}
-                >
-                  View
-                </button>
+              <td className="action-buttons">
+
+                
 
                 <button
                   className="action-btn delete-btn"

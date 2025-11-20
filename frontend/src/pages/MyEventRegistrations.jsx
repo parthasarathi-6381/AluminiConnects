@@ -4,22 +4,32 @@ import api from "../utils/api";
 export default function MyEventRegistrations({ eventId }) {
   const [registrations, setRegistrations] = useState([]);
 
-  // ⭐ All styles inside component
   const styles = {
     container: {
       padding: "20px",
       color: "white",
-      background: "rgba(255,255,255,0.05)",
-      borderRadius: "12px",
-      marginTop: "10px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "flex-start",
+      marginTop: "20px",
+      width: "100%",
+    },
+
+    panel: {
+      background: "rgba(0,0,0,0.35)",
+      borderRadius: "15px",
+      padding: "25px 35px",
+      display: "inline-block",
+      boxShadow: "0 8px 25px rgba(0,0,0,0.35)",
+      backdropFilter: "blur(8px)",
     },
 
     heading: {
       fontSize: "24px",
       fontWeight: "700",
-      marginBottom: "12px",
+      marginBottom: "18px",
     },
-    
+
     exportBtn: {
       padding: "10px 17px",
       background: "linear-gradient(135deg, #00c853, #00e676)",
@@ -38,20 +48,30 @@ export default function MyEventRegistrations({ eventId }) {
       background: "rgba(0, 0, 0, 0.40)",
       borderRadius: "12px",
       overflow: "hidden",
+      tableLayout: "auto",
+      display: "table",
     },
 
+    theadRow: { display: "table-row" },
+    tbodyRow: { display: "table-row" },
+
     th: {
-      padding: "12px",
+      padding: "12px 18px",
       background: "rgba(255,255,255,0.15)",
       color: "white",
       fontWeight: 700,
       textAlign: "left",
+      borderBottom: "1px solid rgba(255,255,255,0.25)",
+      whiteSpace: "nowrap",
     },
 
     td: {
-      padding: "12px",
+      padding: "12px 18px",
       borderBottom: "1px solid rgba(255,255,255,0.1)",
       color: "white",
+      display: "table-cell",
+      whiteSpace: "nowrap",
+      verticalAlign: "middle",
     },
 
     noData: {
@@ -61,7 +81,6 @@ export default function MyEventRegistrations({ eventId }) {
     },
   };
 
-  // ⭐ Fetch registrations
   useEffect(() => {
     if (!eventId) return;
 
@@ -77,70 +96,66 @@ export default function MyEventRegistrations({ eventId }) {
     load();
   }, [eventId]);
 
-  // ⭐ FIXED EXPORT – uses api (with token) + blob download
   const handleExport = async () => {
     try {
       const res = await api.get(
         `/api/events/${eventId}/registrations/export`,
-        { responseType: "blob" } // <- IMPORTANT
+        { responseType: "blob" }
       );
 
       const blob = new Blob([res.data], {
-        type:
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = "event_registrations.xlsx";
-      document.body.appendChild(a);
       a.click();
-      a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Export error:", err);
-      alert("Failed to download Excel file");
+      alert("Failed to download Excel");
+      console.error(err);
     }
   };
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>Event Registrations</h2>
+      <div style={styles.panel}>
+        <h2 style={styles.heading}>Event Registrations</h2>
 
-      {/* ⭐ Export Button */}
-      <button style={styles.exportBtn} onClick={handleExport}>
-        ⬇ Export to Excel
-      </button>
+        <button style={styles.exportBtn} onClick={handleExport}>
+          ⬇ Export to Excel
+        </button>
 
-      {/* ⭐ Empty message */}
-      {registrations.length === 0 ? (
-        <p style={styles.noData}>No one has registered yet.</p>
-      ) : (
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>Name</th>
-              <th style={styles.th}>Email</th>
-              <th style={styles.th}>Role</th>
-              <th style={styles.th}>Registered At</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {registrations.map((reg) => (
-              <tr key={reg._id}>
-                <td style={styles.td}>{reg.name}</td>
-                <td style={styles.td}>{reg.email}</td>
-                <td style={styles.td}>{reg.role}</td>
-                <td style={styles.td}>
-                  {new Date(reg.registeredAt).toLocaleString()}
-                </td>
+        {registrations.length === 0 ? (
+          <p style={styles.noData}>No one has registered yet.</p>
+        ) : (
+          <table style={styles.table}>
+            <thead>
+              <tr style={styles.theadRow}>
+                <th style={styles.th}>Name</th>
+                <th style={styles.th}>Email</th>
+                <th style={styles.th}>Role</th>
+                <th style={styles.th}>Registered At</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
+
+            <tbody>
+              {registrations.map((reg) => (
+                <tr key={reg._id} style={styles.tbodyRow}>
+                  <td style={styles.td}>{reg.name}</td>
+                  <td style={styles.td}>{reg.email}</td>
+                  <td style={styles.td}>{reg.role}</td>
+                  <td style={styles.td}>
+                    {new Date(reg.registeredAt).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }

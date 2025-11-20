@@ -153,11 +153,20 @@
   box-shadow: 0 0 10px rgba(255, 60, 60, 0.8);
   opacity: 0.92;
 }
-td {
-  display: flex;
-  gap: 14px;   /* Increase space */
-  justify-content: center;
+/* restore normal table layout */
+.reg-table td {
+  display: table-cell !important;
+  text-align: left;
+  vertical-align: middle;
 }
+
+/* ONLY action column uses flex */
+.action-buttons {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 14px !important;
+}
+
 
 
 
