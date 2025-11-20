@@ -12,27 +12,11 @@ export default function Sidebar() {
     <div className="sidebar">
       <h2 className="side-title">Admin Panel</h2>
 
-      <ul className="menu">
-        <li
-  className={location.pathname === "/admin" ? "active" : ""}
-  onClick={() => navigate("/admin")}
->
-  Dashboard
-</li>
-
-<li
-  className={location.pathname === "/admin/create-event" ? "active" : ""}
-  onClick={() => navigate("/admin/create-event")}
->
-  Create Event
-</li>
-
-<li
-  className={location.pathname === "/admin/jobs" ? "active" : ""}
-  onClick={() => navigate("/admin/jobs")}
->
-  Create Job / Internship
-</li>
+      <ul>
+        <li onClick={() => navigate("/admin")}>Dashboard</li>
+        <li onClick={() => navigate("/admin/create-event")}>Create Event</li>
+        <li onClick={() => navigate("/admin/jobs")}>Create Job / Internship</li>
+        <li onClick={() => navigate("/admin/achievements")}>Manage Achievements</li>
 
 <p className="section-title">Manage Users</p>
 

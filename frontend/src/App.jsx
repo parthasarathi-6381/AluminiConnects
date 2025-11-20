@@ -30,6 +30,8 @@ import AdminJobs from "./pages/AdminJobs";
 
 import Messages from "./pages/Messages.jsx";
 import AdminEventRegistrations from "./pages/AdminEventRegistrations.jsx";
+import AdminAchievements from "./pages/AdminAchievement.jsx";
+
 // import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 export default function App() {
@@ -72,6 +74,7 @@ export default function App() {
         <Route path="/donations" element={<Donations />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/discussions" element={<Discussion />} />
+        
 
         {/* Admin */}
         <Route
@@ -79,6 +82,7 @@ export default function App() {
           element={
             <ProtectedRoute role="admin">
               <AdminLayout />
+              
             </ProtectedRoute>
           }
         >
@@ -86,9 +90,11 @@ export default function App() {
           <Route path="create-event" element={<CreateEvent />} />
           <Route path="event/:eventId/registrations" element={<AdminEventRegistrations />} />
           <Route path="jobs" element={<AdminJobs />} />
+          <Route path="achievements" element={<AdminAchievements/>}/>
           <Route path="students" element={<ManageStudents />} />
           <Route path="alumni" element={<ManageAlumni />} />
           <Route path="events" element={<EventsDashboard />} />
+          
         </Route>
 
         {/* Alumni */}
