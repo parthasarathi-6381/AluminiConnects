@@ -1,84 +1,91 @@
+/* Sidebar Container */
 .sidebar {
-  width: 250px;
+  width: 260px;
   height: 100vh;
   position: fixed;
   left: 0;
   top: 0;
-  padding: 25px 18px;
-
+  padding: 20px;
+  background: #000;
+  color: white;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  border-right: 1px solid rgba(255, 255, 255, 0.25);
-
-  color: white;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box; /* ✓ You already have this */
 }
 
+
+
+/* Title */
 .side-title {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
   text-align: center;
-  margin-bottom: 20px;
 
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 14px;
+  margin-bottom: 25px;
+
+  border-radius: 18px;
+  background: #2b2b2b;
+  border: 2px solid #3a3a3a;
 }
 
-.menu {
+/* List */
+.sidebar ul {
   list-style: none;
-  padding: 0;
+  padding: 0 0 40px 0; /* Extra bottom padding */
   margin: 0;
 }
 
-.menu li {
-  background: rgba(255, 255, 255, 0.17);
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 10px;
+/* Buttons */
+.sidebar ul li {
+  background: #2f2f2f; /* Dark gray box */
+  padding: 14px;
+  margin: 10px 0;
 
-  font-size: 16px;
+  border-radius: 14px;  /* Rounded corners */
+  font-size: 17px;
   font-weight: 500;
-
   cursor: pointer;
+
   transition: 0.25s ease;
-  border: 1px solid transparent;
 }
 
 /* Hover */
-.menu li:hover {
-  border: 1px solid rgba(255, 255, 255, 0.4);
+.sidebar ul li:hover {
+  background: #3b3b3b;
   transform: translateX(6px);
-  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Section Title */
 .section-title {
-  margin: 14px 4px 8px;
-  font-size: 14px;
-  opacity: 0.8;
+  margin: 20px 0 6px;
+  padding-left: 5px;
+
+  font-size: 15px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+/* ACTIVE BUTTON (purple gradient) */
+.sidebar ul li.active {
+  background: linear-gradient(90deg, #8da9ff, #c985ff);
+  color: white;
+  font-weight: 700;
+
+  border: 2px solid white;
+  transform: translateX(6px);
+}
+
+/* LOGOUT BUTTON (red) */
+.logout {
+  background: #650000 !important; 
+  color: #ffdfdf;
   font-weight: 600;
 }
 
-/* Logout Button */
-.logout {
-  background: rgba(255, 0, 0, 0.35) !important;
-  color: #ffdede;
-}
-
 .logout:hover {
-  background: rgba(255, 0, 0, 0.55) !important;
-  transform: translateX(6px);
-}
-/* Active Page */
-.menu li.active {
-  background: linear-gradient(90deg,#8da9ff,#c985ff);
-  color: white;
-  font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.75);
+  background: #8b0000 !important;
   transform: translateX(6px);
 }

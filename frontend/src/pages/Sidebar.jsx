@@ -13,35 +13,58 @@ export default function Sidebar() {
       <h2 className="side-title">Admin Panel</h2>
 
       <ul>
-        <li onClick={() => navigate("/admin")}>Dashboard</li>
-        <li onClick={() => navigate("/admin/create-event")}>Create Event</li>
-        <li onClick={() => navigate("/admin/jobs")}>Create Job / Internship</li>
-        <li onClick={() => navigate("/admin/achievements")}>Manage Achievements</li>
+  <li
+    className={location.pathname === "/admin" ? "active" : ""}
+    onClick={() => navigate("/admin")}
+  >
+    Dashboard
+  </li>
 
-<p className="section-title">Manage Users</p>
+  <li
+    className={location.pathname === "/admin/create-event" ? "active" : ""}
+    onClick={() => navigate("/admin/create-event")}
+  >
+    Create Event
+  </li>
 
-<li
-  className={location.pathname === "/admin/students" ? "active" : ""}
-  onClick={() => navigate("/admin/students")}
->
-  Students
-</li>
+  <li
+    className={location.pathname === "/admin/jobs" ? "active" : ""}
+    onClick={() => navigate("/admin/jobs")}
+  >
+    Create Job / Internship
+  </li>
 
-<li
-  className={location.pathname === "/admin/alumni" ? "active" : ""}
-  onClick={() => navigate("/admin/alumni")}
->
-  Alumni
-</li>
+  <li
+    className={location.pathname === "/admin/achievements" ? "active" : ""}
+    onClick={() => navigate("/admin/achievements")}
+  >
+    Manage Achievements
+  </li>
 
-<li
-  className={location.pathname === "/login" ? "active logout" : "logout"}
-  onClick={() => navigate("/login")}
->
-  Logout
-</li>
+  <p className="section-title">Manage Users</p>
 
-      </ul>
+  <li
+    className={location.pathname === "/admin/students" ? "active" : ""}
+    onClick={() => navigate("/admin/students")}
+  >
+    Students
+  </li>
+
+  <li
+    className={location.pathname === "/admin/alumni" ? "active" : ""}
+    onClick={() => navigate("/admin/alumni")}
+  >
+    Alumni
+  </li>
+
+  <li
+    className={location.pathname === "/login" ? "active logout" : "logout"}
+    onClick={() => navigate("/login")}
+  >
+    Logout
+  </li>
+</ul>
+
     </div>
   );
 }
