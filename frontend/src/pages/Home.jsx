@@ -200,32 +200,7 @@ export default function Home() {
       </section>
 
       {/* Donations Section */}
-      <section className="container py-5">
-        <h2 className="fw-bold text-center mb-4">❤️ Support Through Donations</h2>
-
-        <div className="row align-items-center g-4">
-          <div className="col-md-6">
-            <h4 className="fw-semibold">Help build a better campus.</h4>
-            <p className="text-muted">
-              Your contribution supports scholarships, events, and student welfare activities.
-            </p>
-            <button
-              className="btn btn-danger"
-              onClick={() => navigate("/donations")}
-            >
-              Donate Now →
-            </button>
-          </div>
-
-          <div className="col-md-6">
-            <img
-              src="https://images.unsplash.com/photo-1516979187457-637abb4f9353"
-              className="img-fluid rounded shadow"
-              alt="Donations"
-            />
-          </div>
-        </div>
-      </section>
+     
 
       {/* Footer */}
       <footer className="text-center py-4 bg-dark text-white mt-5">

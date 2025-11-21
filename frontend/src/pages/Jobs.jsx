@@ -44,20 +44,7 @@ function Jobs() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold" style={{ color: "#c8a6ff" , marginTop:"60px"}}>Job Opportunities</h2>
 
-        <button
-          className="btn"
-          style={{
-            marginTop:"60px",
-            background: "rgba(0,0,0,0.45)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            color: "#d3b3ff",
-            padding: "8px 18px",
-          }}
-          onClick={fetchJobs}
-        >
-          🔄 Refresh
-        </button>
+        
       </div>
 
       {/* Job Cards */}
